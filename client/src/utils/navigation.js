@@ -28,6 +28,6 @@ export const NAV_ITEMS = [
     label: 'Settings',
     to: '/settings',
     icon: Settings,
-    roles: [ROLES.ADMIN, ROLES.MANAGER],
+    roles: [ROLES.ADMIN],
   },
 ];

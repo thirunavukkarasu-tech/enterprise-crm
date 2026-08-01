@@ -44,8 +44,8 @@ export const AppRoutes = () => {
           <Route path="/followups/*" element={<Followups />} />
           <Route path="/reports/*" element={<Reports />} />
 
-          {/* Admin/Manager only */}
-          <Route element={<ProtectedRoute allowedRoles={[ROLES.ADMIN, ROLES.MANAGER]} />}>
+          {/* Admin only */}
+          <Route element={<ProtectedRoute allowedRoles={[ROLES.ADMIN]} />}>
             <Route path="/settings/*" element={<Settings />} />
           </Route>
         </Route>

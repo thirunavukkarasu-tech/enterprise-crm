@@ -16,3 +16,21 @@ export const apiLimiter = rateLimit({
     message: 'Too many requests — please try again later.',
   },
 });
+
+/**
+ * Stricter limiter for credential-sensitive endpoints (login, forgot
+ * password). A much lower ceiling than the general API limiter to slow
+ * down brute-force / credential-stuffing attempts specifically, without
+ * penalizing normal browsing of the rest of the API.
+ */
+export const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 10,
+  standardHeaders: true,
+  legacyHeaders: false,
+  skipSuccessfulRequests: true,
+  message: {
+    success: false,
+    message: 'Too many attempts — please wait a few minutes and try again.',
+  },
+});

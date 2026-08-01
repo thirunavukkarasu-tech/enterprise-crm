@@ -26,9 +26,17 @@ export const protect = asyncHandler(async (req, res, next) => {
     throw err; // normalized by errorHandler (JsonWebTokenError / TokenExpiredError)
   }
 
-  const user = await User.findById(decoded.sub).select('-password');
+  const user = await User.findById(decoded.sub).select('+passwordChangedAt');
   if (!user || !user.isActive) {
     throw ApiError.unauthorized('Account is inactive or no longer exists');
+  }
+
+  // If the password was changed after this token was issued, the token is
+  // stale even though it hasn't technically expired yet — reject it so a
+  // stolen access token becomes useless the moment the user changes their
+  // password.
+  if (user.changedPasswordAfter(decoded.iat)) {
+    throw ApiError.unauthorized('Password was recently changed — please log in again');
   }
 
   req.user = user;

@@ -108,10 +108,21 @@ this design leaves room to introduce TanStack Query without a rewrite.
   configurable via env). Forgot/Reset password uses a single-use, time-boxed
   hashed token stored on the user document (industry-standard pattern, avoids a
   separate token collection for Phase 1 scope).
-- **Authorization (RBAC)**: Three roles — `admin`, `manager`, `sales_executive`.
+- **Authorization (RBAC)**: Four roles — `admin`, `hr`, `manager`, `employee`.
   Role is embedded in the JWT payload and re-verified against the DB on each
   request (not trusted purely from the token) so a demoted/deactivated user is
-  locked out immediately rather than waiting for token expiry.
+  locked out immediately rather than waiting for token expiry. A password
+  change also invalidates any access token issued before it, via a
+  `passwordChangedAt` comparison in the `protect` middleware.
+- **No public registration endpoint**: users are provisioned by an admin (or,
+  for this portfolio build, a seed script), matching how enterprise CRM/HR
+  platforms actually onboard staff — self-signup would let anyone grant
+  themselves an account and is deliberately out of scope.
+- **Refresh token rotation**: each call to `/auth/refresh-token` issues a new
+  refresh token and invalidates the previous one (its hash is overwritten on
+  the user document). Presenting an already-rotated token is treated as a
+  possible replay/theft and immediately revokes the session, rather than
+  silently accepting it.
 - **Route protection**: Backend `protect` middleware verifies the JWT;
   `authorize('admin', 'manager')` middleware enforces role checks per route.
   Frontend `ProtectedRoute` mirrors this for UX (hiding/redirecting) but the

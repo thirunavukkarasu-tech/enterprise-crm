@@ -1,36 +1,50 @@
-import { createContext, useContext, useEffect, useMemo, useState } from 'react';
+import { createContext, useContext, useEffect, useMemo, useState, useCallback } from 'react';
+import { authService } from '../services/authService.js';
+import { setAccessToken } from '../services/api.js';
 
 const AuthContext = createContext(undefined);
 
-/**
- * Holds the current user + auth status app-wide. Phase 1 ships the
- * container and the "restore session on refresh" bootstrap so routing/
- * layout work (ProtectedRoute, Navbar user menu) has something real to
- * render against. login()/logout() are wired to the API in Phase 2.
- */
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
+  // On first load there's no access token in memory (page refresh clears
+  // JS state), so we attempt one silent refresh against the httpOnly
+  // refresh cookie. If it succeeds, the user stays logged in across a
+  // hard refresh with no visible flash of the login page beyond this
+  // initial check; if it fails (no cookie / expired), we fall through to
+  // the login page via ProtectedRoute.
   useEffect(() => {
-    // Placeholder bootstrap: in Phase 2 this calls GET /auth/me with the
-    // stored token to rehydrate the user on a hard refresh.
-    const token = localStorage.getItem('crm_access_token');
-    if (!token) {
-      setIsLoading(false);
-      return;
-    }
-    setIsLoading(false);
+    const restoreSession = async () => {
+      try {
+        const { accessToken, user: restoredUser } = await authService.refresh();
+        setAccessToken(accessToken);
+        setUser(restoredUser);
+      } catch {
+        setAccessToken(null);
+        setUser(null);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    restoreSession();
   }, []);
 
-  const login = async (_credentials) => {
-    throw new Error('Not implemented yet — ships in Phase 2 (Authentication module).');
-  };
+  const login = useCallback(async (credentials) => {
+    const { accessToken, user: loggedInUser } = await authService.login(credentials);
+    setAccessToken(accessToken);
+    setUser(loggedInUser);
+    return loggedInUser;
+  }, []);
 
-  const logout = () => {
-    localStorage.removeItem('crm_access_token');
-    setUser(null);
-  };
+  const logout = useCallback(async () => {
+    try {
+      await authService.logout();
+    } finally {
+      setAccessToken(null);
+      setUser(null);
+    }
+  }, []);
 
   const value = useMemo(
     () => ({
@@ -40,7 +54,7 @@ export const AuthProvider = ({ children }) => {
       login,
       logout,
     }),
-    [user, isLoading]
+    [user, isLoading, login, logout]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

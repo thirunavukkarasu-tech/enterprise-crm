@@ -5,10 +5,10 @@ enterprise full-stack engineering practices: clean architecture, RBAC, and a
 scalable module system — built with **React 19**, **Node.js/Express**, and
 **MongoDB**.
 
-> 🚧 **Status: Phase 1 — Foundation.** Architecture, tooling, routing, and the
-> application shell (auth layout, dashboard layout, sidebar, navbar) are complete.
-> Feature modules (Authentication logic, Customers, Leads, Tasks, Follow-ups,
-> Reports, Settings) ship in subsequent phases — see [Roadmap](#roadmap).
+> 🚧 **Status: Phase 2 — Authentication.** Foundation (Phase 1) plus a complete
+> auth module — JWT access/refresh tokens, RBAC (`admin`, `hr`, `manager`,
+> `employee`), forgot/reset password, and secure httpOnly refresh cookies —
+> are complete. Remaining modules ship in subsequent phases — see [Roadmap](#roadmap).
 
 ## Tech Stack
 
@@ -60,7 +60,15 @@ cp client/.env.example client/.env
 # edit server/.env with your MongoDB URI and JWT secrets
 ```
 
-### 3. Run in development
+### 3. Seed demo users (one per role)
+```bash
+cd server && npm run seed
+```
+Creates `admin@crm.test`, `hr@crm.test`, `manager@crm.test`, and
+`employee@crm.test`, all with password `Password123`. There's no public
+registration endpoint by design — see `docs/ARCHITECTURE.md`.
+
+### 4. Run in development
 ```bash
 # terminal 1
 cd server && npm run dev     # http://localhost:5000
@@ -68,6 +76,8 @@ cd server && npm run dev     # http://localhost:5000
 # terminal 2
 cd client && npm run dev     # http://localhost:5173
 ```
+
+Full endpoint reference: [`docs/API_AUTH.md`](./docs/API_AUTH.md).
 
 The Vite dev server proxies `/api` requests to the Express server (see
 `client/vite.config.js`), so the frontend can simply call `/api/v1/...`.
@@ -83,7 +93,7 @@ Mono (data) typefaces. Tokens live in `client/tailwind.config.js`.
 ## Roadmap
 
 - [x] **Phase 1** — Architecture, project setup, routing, auth & dashboard layouts, sidebar, navbar
-- [ ] **Phase 2** — Authentication (login, logout, forgot/reset password, JWT, RBAC)
+- [x] **Phase 2** — Authentication (login, logout, forgot/reset password, JWT access + refresh tokens, RBAC)
 - [ ] **Phase 3** — Dashboard (KPI cards, revenue summary, pipeline, charts, recent activity)
 - [ ] **Phase 4** — Customer Management (CRUD, profile, search, filter, pagination)
 - [ ] **Phase 5** — Lead Management (status, source, assignment, follow-up history, conversion)

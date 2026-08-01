@@ -5,12 +5,14 @@
  */
 export const ROLES = Object.freeze({
   ADMIN: 'admin',
+  HR: 'hr',
   MANAGER: 'manager',
-  SALES_EXECUTIVE: 'sales_executive',
+  EMPLOYEE: 'employee',
 });
 
 export const ROLE_LABELS = {
   [ROLES.ADMIN]: 'Administrator',
+  [ROLES.HR]: 'HR',
   [ROLES.MANAGER]: 'Manager',
-  [ROLES.SALES_EXECUTIVE]: 'Sales Executive',
+  [ROLES.EMPLOYEE]: 'Employee',
 };

@@ -1,8 +1,9 @@
 import { useForm } from 'react-hook-form';
-import { Link } from 'react-router-dom';
-import toast from 'react-hot-toast';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { useState } from 'react';
 import { Input } from '../../components/ui/Input.jsx';
 import { Button } from '../../components/ui/Button.jsx';
+import { useAuth } from '../../context/AuthContext.jsx';
 
 export default function Login() {
   const {
@@ -10,12 +11,21 @@ export default function Login() {
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm();
+  const [formError, setFormError] = useState('');
+  const { login } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
 
-  const onSubmit = async (_values) => {
-    // Full implementation (POST /auth/login, token storage, redirect) ships
-    // in Phase 2 — Authentication module. Kept as a clear stub for now so
-    // the routing/layout demo is fully clickable end-to-end.
-    toast('Login logic ships in Phase 2 🚧');
+  const redirectTo = location.state?.from?.pathname || '/dashboard';
+
+  const onSubmit = async (values) => {
+    setFormError('');
+    try {
+      await login(values);
+      navigate(redirectTo, { replace: true });
+    } catch (err) {
+      setFormError(err.response?.data?.message || 'Unable to sign in. Please try again.');
+    }
   };
 
   return (
@@ -23,11 +33,18 @@ export default function Login() {
       <h1 className="font-display text-2xl font-semibold text-ink">Welcome back</h1>
       <p className="mt-1.5 text-sm text-ink-600">Sign in to your CRM workspace.</p>
 
-      <form onSubmit={handleSubmit(onSubmit)} className="mt-8 space-y-5" noValidate>
+      {formError && (
+        <div className="mt-6 rounded-lg border border-rose-500/30 bg-rose-50 px-3.5 py-2.5 text-sm text-rose-600">
+          {formError}
+        </div>
+      )}
+
+      <form onSubmit={handleSubmit(onSubmit)} className="mt-6 space-y-5" noValidate>
         <Input
           label="Work email"
           type="email"
           placeholder="you@company.com"
+          autoComplete="email"
           error={errors.email?.message}
           {...register('email', {
             required: 'Email is required',
@@ -38,6 +55,7 @@ export default function Login() {
           label="Password"
           type="password"
           placeholder="••••••••"
+          autoComplete="current-password"
           error={errors.password?.message}
           {...register('password', { required: 'Password is required' })}
         />
@@ -56,6 +74,11 @@ export default function Login() {
           Sign In
         </Button>
       </form>
+
+      <p className="mt-8 text-center text-xs text-ink-600">
+        Demo accounts — see <code className="rounded bg-surface-200 px-1 py-0.5">server/src/seed/seed.js</code> for
+        credentials per role.
+      </p>
     </div>
   );
 }
