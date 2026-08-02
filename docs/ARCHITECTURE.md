@@ -154,7 +154,39 @@ this design leaves room to introduce TanStack Query without a rewrite.
 | Environment config     | `config/env.js` (fails fast if required vars missing) |
 | Axios client (frontend) | `services/api.js` (interceptors: auth header, 401 refresh/logout, toast on error) |
 
-## 7. Why This Scales to the Full Module List
+## 8. Dashboard Architecture (Phase 3 additions)
+
+- **Service layer activated**: `server/src/services/dashboard.service.js` is
+  the first real use of the `services/` layer promised in §2 — controllers
+  stay a thin `parse req → call service → send ApiResponse`, and every
+  aggregation pipeline lives in one testable, framework-agnostic module.
+- **Granular endpoints over one mega-endpoint**: the dashboard exposes nine
+  small endpoints (`/kpis`, `/pipeline`, `/revenue-analytics`, ...) rather
+  than one `/dashboard/summary` blob. Each frontend widget fetches its own
+  data independently (`useApiQuery` per widget), so one slow or failing
+  endpoint degrades a single card instead of blocking the entire page —
+  and each widget gets its own accurate loading skeleton instead of an
+  all-or-nothing spinner.
+- **Widget isolation via `ChartCard` + `ErrorBoundary`**: every widget goes
+  through the same loading → error → empty → content state machine
+  (`ChartCard`) and is wrapped in a render-level `ErrorBoundary`, so a bug
+  in one chart can't take down the rest of the dashboard.
+- **Code-split charting**: `recharts`-based widgets (`RevenueAnalyticsChart`,
+  `LeadConversionChart`, `CustomerGrowthStats`) are the only consumers of
+  that dependency and are loaded via `React.lazy` + `Suspense`, keeping
+  the charting library out of the initial bundle for users who haven't
+  scrolled to (or don't have permission to see) those widgets.
+- **RBAC-aware data scoping**: `server/src/utils/scope.js` transparently
+  filters every dashboard query to "my records only" for Employees while
+  leaving Admin/HR/Manager unscoped — enforced in the service layer, so it
+  can't be bypassed by calling the endpoint directly.
+- **Minimal domain models introduced early**: `Customer`, `Lead`,
+  `Opportunity`, `Task`, `Activity`, `Notification` are given lean, real
+  Mongoose schemas now so the dashboard aggregates over genuine data rather
+  than mocks — the full CRUD modules for each (validation rules, more
+  fields, UI) are additive in later phases and won't change this contract.
+
+## 9. Why This Scales to the Full Module List
 
 Every remaining module (Customers, Leads, Tasks, Follow-ups, Reports, Settings)
 plugs into the same skeleton: a Mongoose model, a validator, a service, a

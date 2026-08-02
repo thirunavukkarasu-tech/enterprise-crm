@@ -76,7 +76,7 @@ export default function Login() {
       </form>
 
       <p className="mt-8 text-center text-xs text-ink-600">
-        Demo accounts — see <code className="rounded bg-surface-200 px-1 py-0.5">server/src/seed/seed.js</code> for
+        Demo accounts — see <code className="rounded bg-surface-200 px-1 py-0.5">server/src/seed/users.seed.js</code> for
         credentials per role.
       </p>
     </div>

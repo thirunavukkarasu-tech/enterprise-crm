@@ -102,6 +102,8 @@ the single source of truth.
 
 ## Demo Accounts
 
-Run `npm run seed` inside `server/` to create one account per role
-(`admin@crm.test`, `hr@crm.test`, `manager@crm.test`, `employee@crm.test`,
-all with password `Password123`).
+Run `npm run seed` inside `server/` to create demo accounts — one Admin,
+one HR, one Manager, and three Employees (`priya@crm.test`,
+`diego@crm.test`, `chloe@crm.test`) — all with password `Password123`, plus
+realistic dashboard data. See `docs/API_DASHBOARD.md` for the seeded
+domain data.
