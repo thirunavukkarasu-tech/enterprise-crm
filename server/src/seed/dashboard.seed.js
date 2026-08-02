@@ -41,15 +41,21 @@ export const seedDashboardData = async (salesUsers) => {
   }
 
   // --- Customers -------------------------------------------------------------
+  const TAG_POOL = ['vip', 'enterprise', 'smb', 'renewal-risk', 'upsell', 'newsletter'];
   const customers = Array.from({ length: 60 }).map(() => ({
     name: faker.person.fullName(),
     email: faker.internet.email().toLowerCase(),
     phone: faker.phone.number(),
     company: faker.company.name(),
+    industry: pick(['SaaS', 'Retail', 'Manufacturing', 'Healthcare', 'Finance', 'Education']),
     status: pickWeighted([
-      ['active', 8],
+      ['lead', 2],
+      ['prospect', 2],
+      ['active', 6],
       ['inactive', 2],
+      ['churned', 1],
     ]),
+    tags: faker.helpers.arrayElements(TAG_POOL, { min: 0, max: 2 }),
     assignedTo: pick(salesUsers)._id,
     createdAt: dateWithinLastMonths(6),
   }));

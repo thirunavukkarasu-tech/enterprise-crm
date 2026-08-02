@@ -45,5 +45,5 @@ export const useApiQuery = (queryFn, deps = []) => {
     execute();
   }, [execute]);
 
-  return { data, isLoading, error, refetch: execute };
+  return { data, isLoading, error, refetch: execute, setData };
 };

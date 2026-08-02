@@ -43,10 +43,13 @@ export const OPEN_OPPORTUNITY_STAGES = Object.freeze(
 export const TASK_STATUSES = Object.freeze(['pending', 'in_progress', 'completed']);
 export const TASK_PRIORITIES = Object.freeze(['low', 'medium', 'high']);
 
-export const CUSTOMER_STATUSES = Object.freeze(['active', 'inactive']);
+export const CUSTOMER_STATUSES = Object.freeze(['lead', 'prospect', 'active', 'inactive', 'churned']);
 
 export const ACTIVITY_TYPES = Object.freeze([
   'customer_created',
+  'customer_updated',
+  'customer_status_changed',
+  'customer_deleted',
   'lead_created',
   'lead_status_changed',
   'opportunity_created',

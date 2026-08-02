@@ -10,6 +10,8 @@ import {
   Calendar,
   StickyNote,
   History,
+  Pencil,
+  Trash2,
 } from 'lucide-react';
 import { useApiQuery } from '../../../hooks/useApiQuery.js';
 import { dashboardService } from '../../../services/dashboardService.js';
@@ -19,6 +21,9 @@ import { formatRelativeTime } from '../../../utils/formatters.js';
 
 const ICONS = {
   customer_created: { icon: UserPlus, tone: 'text-brand-600 bg-brand-50' },
+  customer_updated: { icon: Pencil, tone: 'text-amber-600 bg-amber-50' },
+  customer_status_changed: { icon: TrendingUp, tone: 'text-brand-600 bg-brand-50' },
+  customer_deleted: { icon: Trash2, tone: 'text-rose-600 bg-rose-50' },
   lead_created: { icon: Target, tone: 'text-amber-600 bg-amber-50' },
   lead_status_changed: { icon: TrendingUp, tone: 'text-brand-600 bg-brand-50' },
   opportunity_created: { icon: Briefcase, tone: 'text-brand-600 bg-brand-50' },

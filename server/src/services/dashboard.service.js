@@ -27,6 +27,7 @@ const monthBounds = (offset = 0) => {
 
 export const getKpis = async (user) => {
   const scope = scopeToUser(user);
+  const activeCustomerScope = { ...scope, isDeleted: false };
   const thisMonth = monthBounds(0);
   const lastMonth = monthBounds(1);
 
@@ -42,9 +43,9 @@ export const getKpis = async (user) => {
     revenueThisMonthAgg,
     revenueLastMonthAgg,
   ] = await Promise.all([
-    Customer.countDocuments(scope),
-    Customer.countDocuments({ ...scope, createdAt: { $gte: thisMonth.start, $lt: thisMonth.end } }),
-    Customer.countDocuments({ ...scope, createdAt: { $gte: lastMonth.start, $lt: lastMonth.end } }),
+    Customer.countDocuments(activeCustomerScope),
+    Customer.countDocuments({ ...activeCustomerScope, createdAt: { $gte: thisMonth.start, $lt: thisMonth.end } }),
+    Customer.countDocuments({ ...activeCustomerScope, createdAt: { $gte: lastMonth.start, $lt: lastMonth.end } }),
     Lead.countDocuments({ ...scope, status: { $nin: ['won', 'lost'] } }),
     Lead.countDocuments({ ...scope, createdAt: { $gte: thisMonth.start, $lt: thisMonth.end } }),
     Lead.countDocuments({ ...scope, createdAt: { $gte: lastMonth.start, $lt: lastMonth.end } }),
@@ -269,7 +270,7 @@ export const getTopPerformers = async (limit = 5) => {
 // ---------------------------------------------------------------------------
 
 export const getCustomerGrowth = async (user, months = 6) => {
-  const scope = scopeToUser(user);
+  const scope = { ...scopeToUser(user), isDeleted: false };
   const buckets = lastNMonths(months);
 
   const [newPerMonth, totalBeforeRange] = await Promise.all([

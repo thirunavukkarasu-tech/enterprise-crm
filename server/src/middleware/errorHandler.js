@@ -28,6 +28,11 @@ const normalizeError = (err) => {
     return ApiError.conflict(`${field} already exists`);
   }
 
+  // File upload errors (wrong field name, file too large, etc.)
+  if (err.name === 'MulterError') {
+    return ApiError.badRequest(`Upload error: ${err.message}`);
+  }
+
   // JWT errors
   if (err.name === 'JsonWebTokenError') {
     return ApiError.unauthorized('Invalid authentication token');

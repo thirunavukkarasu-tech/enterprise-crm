@@ -78,7 +78,10 @@ api.interceptors.response.use(
       }
     }
 
-    const message = response?.data?.message || 'Something went wrong. Please try again.';
+    const message =
+      response?.data instanceof Blob
+        ? 'Something went wrong. Please try again.'
+        : response?.data?.message || 'Something went wrong. Please try again.';
     if (!isAuthEndpoint(config?.url) && status !== 422 && status !== 400) {
       // Field-level validation (400/422) is rendered inline on forms instead
       // of double-surfaced as a toast; auth endpoints handle their own errors.

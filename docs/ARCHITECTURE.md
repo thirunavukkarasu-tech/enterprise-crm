@@ -186,9 +186,43 @@ this design leaves room to introduce TanStack Query without a rewrite.
   than mocks — the full CRUD modules for each (validation rules, more
   fields, UI) are additive in later phases and won't change this contract.
 
-## 9. Why This Scales to the Full Module List
+## 10. Customer Management Architecture (Phase 4 additions)
 
-Every remaining module (Customers, Leads, Tasks, Follow-ups, Reports, Settings)
+- **Soft delete over hard delete**: `Customer.isDeleted` + `deletedAt`
+  instead of `deleteOne()`. Customers are referenced by Opportunities,
+  Tasks, and the Activity log — hard-deleting would orphan those records.
+  Every read path filters `isDeleted: false`; a restore capability is a
+  natural addition once an Admin module exists.
+- **Notes embedded, Timeline queried**: notes are free text a rep writes,
+  always read alongside their parent customer, and embedded directly on the
+  document (`customer.notes[]`) to avoid an extra round-trip. The Timeline
+  is system-generated history, backed by the same `Activity` collection the
+  Dashboard already uses (filtered by `relatedCustomer`) — one append-only
+  log serves both the org-wide Dashboard feed and every customer's
+  individual timeline.
+- **Reusable `Table` component**: driven entirely by a `columns` config
+  (`{ key, header, render?, sortable? }`) rather than each module hand-
+  rolling a `<table>`. Sorting is controlled by the parent and reported via
+  callback rather than handled internally, since paginated data needs the
+  sort applied server-side, not client-side on the current page only.
+- **CSV import is partial-success, not all-or-nothing**: each row is
+  validated and inserted independently; a bad row is skipped and reported
+  with a reason rather than failing the entire batch. This matches how a
+  non-technical user actually experiences "importing a spreadsheet" — one
+  malformed row shouldn't block 999 good ones.
+- **Hand-rolled CSV parsing/generation kept minimal**: `csv-parse` (a
+  well-maintained, dependency-free parser) is used for import since CSV
+  quoting/escaping edge cases are easy to get wrong by hand; export uses a
+  ~15-line hand-rolled stringifier since the output shape is fixed and
+  small, not worth a second dependency for.
+- **RBAC ownership scoping enforced in the service layer**: `assertAccess()`
+  in `customer.service.js` — not in a route middleware — so it's applied
+  consistently across read, update, delete, notes, and timeline without
+  relying on every controller remembering to check it.
+
+## 11. Why This Scales to the Full Module List
+
+Every remaining module (Leads, Tasks, Follow-ups, Reports, Settings)
 plugs into the same skeleton: a Mongoose model, a validator, a service, a
 controller, a router mounted in `app.js`, and a `pages/<module>` folder on the
 frontend with its own service file. Phase 1 exists so that from Phase 2 onward,

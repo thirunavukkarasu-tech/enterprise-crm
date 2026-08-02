@@ -10,6 +10,7 @@ import ForgotPassword from '../pages/auth/ForgotPassword.jsx';
 import ResetPassword from '../pages/auth/ResetPassword.jsx';
 import Dashboard from '../pages/dashboard/Dashboard.jsx';
 import Customers from '../pages/customers/Customers.jsx';
+import CustomerDetail from '../pages/customers/CustomerDetail.jsx';
 import Leads from '../pages/leads/Leads.jsx';
 import Tasks from '../pages/tasks/Tasks.jsx';
 import Followups from '../pages/followups/Followups.jsx';
@@ -38,7 +39,8 @@ export const AppRoutes = () => {
       <Route element={<ProtectedRoute />}>
         <Route element={<DashboardLayout />}>
           <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/customers/*" element={<Customers />} />
+          <Route path="/customers" element={<Customers />} />
+          <Route path="/customers/:id" element={<CustomerDetail />} />
           <Route path="/leads/*" element={<Leads />} />
           <Route path="/tasks/*" element={<Tasks />} />
           <Route path="/followups/*" element={<Followups />} />
