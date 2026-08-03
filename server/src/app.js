@@ -1,3 +1,4 @@
+import path from 'path';
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
@@ -29,6 +30,12 @@ app.use(mongoSanitize()); // strips $ / . operators from user input (NoSQL injec
 if (!env.isProd) {
   app.use(morgan('dev'));
 }
+
+// --- Static file serving (lead attachments) -----------------------------------
+// Served under the same origin as the API (proxied by Vite in dev — see
+// client/vite.config.js) so helmet's default Cross-Origin-Resource-Policy
+// doesn't need loosening just to display an attachment thumbnail.
+app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
 
 // --- Rate limiting (applies to all /api routes) -----------------------------
 app.use(`/api/${env.apiVersion}`, apiLimiter);

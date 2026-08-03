@@ -5,11 +5,11 @@ enterprise full-stack engineering practices: clean architecture, RBAC, and a
 scalable module system — built with **React 19**, **Node.js/Express**, and
 **MongoDB**.
 
-> 🚧 **Status: Phase 4 — Customer Management.** Foundation, Authentication,
-> Dashboard, and a full Customer Management module (CRUD, soft delete,
-> notes, tags, timeline, server-side pagination/search/filter, CSV
-> import/export) are complete. Remaining modules ship in subsequent phases —
-> see [Roadmap](#roadmap).
+> 🚧 **Status: Phase 5 — Lead Management.** Foundation, Authentication,
+> Dashboard, Customer Management, and a full Lead Management module (status/
+> source/priority, assignment, notes, attachments, activity timeline, lead →
+> customer conversion, server-side pagination/search/filter) are complete.
+> Remaining modules ship in subsequent phases — see [Roadmap](#roadmap).
 
 ## Tech Stack
 
@@ -82,7 +82,8 @@ cd client && npm run dev     # http://localhost:5173
 
 Full endpoint reference: [`docs/API_AUTH.md`](./docs/API_AUTH.md) ·
 [`docs/API_DASHBOARD.md`](./docs/API_DASHBOARD.md) ·
-[`docs/API_CUSTOMERS.md`](./docs/API_CUSTOMERS.md).
+[`docs/API_CUSTOMERS.md`](./docs/API_CUSTOMERS.md) ·
+[`docs/API_LEADS.md`](./docs/API_LEADS.md).
 
 The Vite dev server proxies `/api` requests to the Express server (see
 `client/vite.config.js`), so the frontend can simply call `/api/v1/...`.
@@ -101,7 +102,7 @@ Mono (data) typefaces. Tokens live in `client/tailwind.config.js`.
 - [x] **Phase 2** — Authentication (login, logout, forgot/reset password, JWT access + refresh tokens, RBAC)
 - [x] **Phase 3** — Dashboard (KPI cards, sales pipeline, revenue & lead analytics, activity timeline, tasks, notifications, top performers, customer growth)
 - [x] **Phase 4** — Customer Management (CRUD, soft delete, notes, tags, timeline, search/filter/pagination, CSV import/export)
-- [ ] **Phase 5** — Lead Management (status, source, assignment, follow-up history, conversion)
+- [x] **Phase 5** — Lead Management (status, source, priority, assignment, notes, attachments, timeline, lead → customer conversion)
 - [ ] **Phase 6** — Task Management (create/assign, due dates, priority, status tracking)
 - [ ] **Phase 7** — Follow-up Management (call logs, meetings, notes, reminders)
 - [ ] **Phase 8** — Reports (sales, customer, lead, dashboard analytics)

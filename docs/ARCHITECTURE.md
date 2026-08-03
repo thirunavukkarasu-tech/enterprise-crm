@@ -154,7 +154,7 @@ this design leaves room to introduce TanStack Query without a rewrite.
 | Environment config     | `config/env.js` (fails fast if required vars missing) |
 | Axios client (frontend) | `services/api.js` (interceptors: auth header, 401 refresh/logout, toast on error) |
 
-## 8. Dashboard Architecture (Phase 3 additions)
+## 7. Dashboard Architecture (Phase 3 additions)
 
 - **Service layer activated**: `server/src/services/dashboard.service.js` is
   the first real use of the `services/` layer promised in §2 — controllers
@@ -186,7 +186,7 @@ this design leaves room to introduce TanStack Query without a rewrite.
   than mocks — the full CRUD modules for each (validation rules, more
   fields, UI) are additive in later phases and won't change this contract.
 
-## 10. Customer Management Architecture (Phase 4 additions)
+## 8. Customer Management Architecture (Phase 4 additions)
 
 - **Soft delete over hard delete**: `Customer.isDeleted` + `deletedAt`
   instead of `deleteOne()`. Customers are referenced by Opportunities,
@@ -220,9 +220,37 @@ this design leaves room to introduce TanStack Query without a rewrite.
   consistently across read, update, delete, notes, and timeline without
   relying on every controller remembering to check it.
 
-## 11. Why This Scales to the Full Module List
+## 9. Lead Management Architecture (Phase 5 additions)
 
-Every remaining module (Leads, Tasks, Follow-ups, Reports, Settings)
+- **Single update endpoint, not one-per-field**: status changes, priority
+  changes, and reassignment all go through `PATCH /leads/:id` — the service
+  layer inspects which field actually changed and logs the appropriate
+  activity type (`lead_status_changed` / `lead_assigned` / generic
+  `lead_updated`). A dedicated `/status` or `/assign` endpoint would just be
+  a thinner wrapper around the same update path; this keeps the API surface
+  smaller without losing activity-log fidelity. Same pattern as Customers.
+- **Conversion creates, never mutates**: `POST /leads/:id/convert` creates a
+  brand-new `Customer` document rather than "promoting" the Lead document
+  in place. The Lead survives (`status: won`, `convertedToCustomer` set) so
+  source/funnel reporting still has the original record to attribute a win
+  to — mutating a Lead into a Customer in place would make "conversion rate
+  by lead source" unanswerable after the fact.
+- **Local-disk attachments behind a storage-agnostic schema**: attachment
+  metadata (`fileName`, `url`, `mimeType`, `size`, `uploadedBy`) is exactly
+  the shape an S3/GCS integration would also produce, so
+  `server/src/middleware/upload.js` is the only file that would change to
+  swap storage backends — the Lead schema, service, and every frontend
+  component are already storage-agnostic.
+- **One append-only Activity log, three consumers**: the same `Activity`
+  collection introduced in Phase 3 (Dashboard) and extended in Phase 4
+  (Customers) now also backs the Lead timeline via `relatedLead` — three
+  different UI surfaces (org-wide dashboard feed, a customer's timeline, a
+  lead's timeline) share one write path and one collection instead of each
+  module inventing its own history mechanism.
+
+## 10. Why This Scales to the Full Module List
+
+Every remaining module (Tasks, Follow-ups, Reports, Settings)
 plugs into the same skeleton: a Mongoose model, a validator, a service, a
 controller, a router mounted in `app.js`, and a `pages/<module>` folder on the
 frontend with its own service file. Phase 1 exists so that from Phase 2 onward,

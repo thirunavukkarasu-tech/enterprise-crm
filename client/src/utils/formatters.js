@@ -27,6 +27,13 @@ export const formatRelativeTime = (date) => {
   return `${formatDistanceToNowStrict(new Date(date))} ago`;
 };
 
+export const formatFileSize = (bytes) => {
+  if (!bytes) return '0 B';
+  const units = ['B', 'KB', 'MB', 'GB'];
+  const i = Math.floor(Math.log(bytes) / Math.log(1024));
+  return `${(bytes / 1024 ** i).toFixed(i === 0 ? 0 : 1)} ${units[i]}`;
+};
+
 export const formatDueDate = (date) => {
   if (!date) return '';
   const d = new Date(date);

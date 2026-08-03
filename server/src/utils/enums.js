@@ -43,6 +43,12 @@ export const OPEN_OPPORTUNITY_STAGES = Object.freeze(
 export const TASK_STATUSES = Object.freeze(['pending', 'in_progress', 'completed']);
 export const TASK_PRIORITIES = Object.freeze(['low', 'medium', 'high']);
 
+// Kept distinct from TASK_PRIORITIES (even though the values overlap today)
+// since leads and tasks are independent domain concepts that happen to
+// share a shape — collapsing them into one shared enum would couple two
+// modules that should be free to diverge later (e.g. an "urgent" lead tier).
+export const LEAD_PRIORITIES = Object.freeze(['low', 'medium', 'high']);
+
 export const CUSTOMER_STATUSES = Object.freeze(['lead', 'prospect', 'active', 'inactive', 'churned']);
 
 export const ACTIVITY_TYPES = Object.freeze([
@@ -51,7 +57,13 @@ export const ACTIVITY_TYPES = Object.freeze([
   'customer_status_changed',
   'customer_deleted',
   'lead_created',
+  'lead_updated',
   'lead_status_changed',
+  'lead_assigned',
+  'lead_converted',
+  'lead_deleted',
+  'lead_note_added',
+  'lead_attachment_added',
   'opportunity_created',
   'opportunity_won',
   'opportunity_lost',

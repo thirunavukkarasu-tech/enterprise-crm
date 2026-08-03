@@ -12,6 +12,7 @@ import Dashboard from '../pages/dashboard/Dashboard.jsx';
 import Customers from '../pages/customers/Customers.jsx';
 import CustomerDetail from '../pages/customers/CustomerDetail.jsx';
 import Leads from '../pages/leads/Leads.jsx';
+import LeadDetail from '../pages/leads/LeadDetail.jsx';
 import Tasks from '../pages/tasks/Tasks.jsx';
 import Followups from '../pages/followups/Followups.jsx';
 import Reports from '../pages/reports/Reports.jsx';
@@ -41,7 +42,8 @@ export const AppRoutes = () => {
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/customers" element={<Customers />} />
           <Route path="/customers/:id" element={<CustomerDetail />} />
-          <Route path="/leads/*" element={<Leads />} />
+          <Route path="/leads" element={<Leads />} />
+          <Route path="/leads/:id" element={<LeadDetail />} />
           <Route path="/tasks/*" element={<Tasks />} />
           <Route path="/followups/*" element={<Followups />} />
           <Route path="/reports/*" element={<Reports />} />

@@ -66,9 +66,15 @@ export const seedDashboardData = async (salesUsers) => {
   const leads = Array.from({ length: 80 }).map(() => ({
     name: faker.person.fullName(),
     email: faker.internet.email().toLowerCase(),
+    phone: faker.phone.number(),
     company: faker.company.name(),
     status: pickWeighted(LEAD_STATUSES.map((s) => [s, s === 'lost' ? 3 : s === 'won' ? 2 : 4])),
     source: pick(LEAD_SOURCES),
+    priority: pickWeighted([
+      ['low', 3],
+      ['medium', 5],
+      ['high', 2],
+    ]),
     estimatedValue: faker.number.int({ min: 1000, max: 50000 }),
     assignedTo: pick(salesUsers)._id,
     createdAt: dateWithinLastMonths(6),

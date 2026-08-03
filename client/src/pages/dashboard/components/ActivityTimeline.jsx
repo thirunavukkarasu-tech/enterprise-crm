@@ -12,6 +12,9 @@ import {
   History,
   Pencil,
   Trash2,
+  UserCog,
+  ArrowRightCircle,
+  Paperclip,
 } from 'lucide-react';
 import { useApiQuery } from '../../../hooks/useApiQuery.js';
 import { dashboardService } from '../../../services/dashboardService.js';
@@ -25,7 +28,13 @@ const ICONS = {
   customer_status_changed: { icon: TrendingUp, tone: 'text-brand-600 bg-brand-50' },
   customer_deleted: { icon: Trash2, tone: 'text-rose-600 bg-rose-50' },
   lead_created: { icon: Target, tone: 'text-amber-600 bg-amber-50' },
+  lead_updated: { icon: Pencil, tone: 'text-amber-600 bg-amber-50' },
   lead_status_changed: { icon: TrendingUp, tone: 'text-brand-600 bg-brand-50' },
+  lead_assigned: { icon: UserCog, tone: 'text-amber-600 bg-amber-50' },
+  lead_converted: { icon: ArrowRightCircle, tone: 'text-brand-600 bg-brand-50' },
+  lead_deleted: { icon: Trash2, tone: 'text-rose-600 bg-rose-50' },
+  lead_note_added: { icon: StickyNote, tone: 'text-ink-700 bg-surface-200' },
+  lead_attachment_added: { icon: Paperclip, tone: 'text-ink-700 bg-surface-200' },
   opportunity_created: { icon: Briefcase, tone: 'text-brand-600 bg-brand-50' },
   opportunity_won: { icon: Trophy, tone: 'text-brand-600 bg-brand-50' },
   opportunity_lost: { icon: XCircle, tone: 'text-rose-600 bg-rose-50' },
