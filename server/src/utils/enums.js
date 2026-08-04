@@ -40,8 +40,18 @@ export const OPEN_OPPORTUNITY_STAGES = Object.freeze(
   OPPORTUNITY_STAGES.filter((s) => s !== 'closed_won' && s !== 'closed_lost')
 );
 
-export const TASK_STATUSES = Object.freeze(['pending', 'in_progress', 'completed']);
-export const TASK_PRIORITIES = Object.freeze(['low', 'medium', 'high']);
+export const TASK_STATUSES = Object.freeze(['pending', 'in_progress', 'completed', 'cancelled']);
+export const TASK_PRIORITIES = Object.freeze(['low', 'medium', 'high', 'critical']);
+
+export const TASK_CATEGORIES = Object.freeze([
+  'call',
+  'email',
+  'meeting',
+  'demo',
+  'proposal',
+  'administrative',
+  'other',
+]);
 
 // Kept distinct from TASK_PRIORITIES (even though the values overlap today)
 // since leads and tasks are independent domain concepts that happen to
@@ -50,6 +60,11 @@ export const TASK_PRIORITIES = Object.freeze(['low', 'medium', 'high']);
 export const LEAD_PRIORITIES = Object.freeze(['low', 'medium', 'high']);
 
 export const CUSTOMER_STATUSES = Object.freeze(['lead', 'prospect', 'active', 'inactive', 'churned']);
+
+export const FOLLOWUP_TYPES = Object.freeze(['call', 'meeting', 'email']);
+
+// Ordered deliberately: the natural lifecycle of a scheduled interaction.
+export const FOLLOWUP_STATUSES = Object.freeze(['scheduled', 'completed', 'cancelled', 'no_show']);
 
 export const ACTIVITY_TYPES = Object.freeze([
   'customer_created',
@@ -67,10 +82,22 @@ export const ACTIVITY_TYPES = Object.freeze([
   'opportunity_created',
   'opportunity_won',
   'opportunity_lost',
+  'task_created',
+  'task_updated',
+  'task_status_changed',
+  'task_assigned',
   'task_completed',
+  'task_deleted',
+  'task_comment_added',
+  'task_attachment_added',
+  'followup_scheduled',
+  'followup_updated',
+  'followup_completed',
+  'followup_cancelled',
+  'followup_note_added',
   'call_logged',
   'meeting_scheduled',
   'note_added',
 ]);
 
-export const NOTIFICATION_TYPES = Object.freeze(['task', 'lead', 'opportunity', 'system']);
+export const NOTIFICATION_TYPES = Object.freeze(['task', 'lead', 'opportunity', 'followup', 'system']);

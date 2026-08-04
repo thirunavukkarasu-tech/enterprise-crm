@@ -207,7 +207,7 @@ export const getRecentActivities = async (user, limit = 10) => {
 export const getUpcomingTasks = async (user, limit = 5) => {
   const scope = scopeToUser(user);
 
-  return Task.find({ ...scope, status: { $ne: 'completed' } })
+  return Task.find({ ...scope, isDeleted: false, status: { $nin: ['completed', 'cancelled'] } })
     .sort({ dueDate: 1 })
     .limit(limit)
     .populate('assignedTo', 'name')

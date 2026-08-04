@@ -14,6 +14,7 @@ import CustomerDetail from '../pages/customers/CustomerDetail.jsx';
 import Leads from '../pages/leads/Leads.jsx';
 import LeadDetail from '../pages/leads/LeadDetail.jsx';
 import Tasks from '../pages/tasks/Tasks.jsx';
+import TaskDetail from '../pages/tasks/TaskDetail.jsx';
 import Followups from '../pages/followups/Followups.jsx';
 import Reports from '../pages/reports/Reports.jsx';
 import Settings from '../pages/settings/Settings.jsx';
@@ -44,8 +45,9 @@ export const AppRoutes = () => {
           <Route path="/customers/:id" element={<CustomerDetail />} />
           <Route path="/leads" element={<Leads />} />
           <Route path="/leads/:id" element={<LeadDetail />} />
-          <Route path="/tasks/*" element={<Tasks />} />
-          <Route path="/followups/*" element={<Followups />} />
+          <Route path="/tasks" element={<Tasks />} />
+          <Route path="/tasks/:id" element={<TaskDetail />} />
+          <Route path="/followups" element={<Followups />} />
           <Route path="/reports/*" element={<Reports />} />
 
           {/* Admin only */}

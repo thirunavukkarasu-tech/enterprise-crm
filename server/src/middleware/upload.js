@@ -22,16 +22,13 @@ export const uploadCsv = multer({
 });
 
 // ---------------------------------------------------------------------------
-// Lead attachments — local disk storage
+// Generic attachment uploader — local disk storage
 // ---------------------------------------------------------------------------
-// Files are written to `server/uploads/leads/` and served statically (see
+// Files are written to `server/uploads/<subdir>/` and served statically (see
 // app.js). This is a deliberate portfolio-scope simplification: swapping to
-// S3/GCS later only means changing this one file — the Lead schema stores
-// generic { fileName, url, mimeType, size } metadata that doesn't care
-// where the bytes actually live (see models/Lead.js).
-const ATTACHMENTS_DIR = path.join(process.cwd(), 'uploads', 'leads');
-fs.mkdirSync(ATTACHMENTS_DIR, { recursive: true });
-
+// S3/GCS later only means changing this one file — every schema that embeds
+// attachments (Lead, Task) stores the same generic { fileName, url,
+// mimeType, size } shape that doesn't care where the bytes actually live.
 const ALLOWED_ATTACHMENT_TYPES = new Set([
   'image/png',
   'image/jpeg',
@@ -45,17 +42,6 @@ const ALLOWED_ATTACHMENT_TYPES = new Set([
   'text/csv',
 ]);
 
-const attachmentStorage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, ATTACHMENTS_DIR),
-  filename: (req, file, cb) => {
-    // Randomized filename on disk — never trust the client-provided name
-    // for the stored path (path traversal / collision safety). The
-    // human-readable original name is preserved separately in the DB.
-    const uniqueSuffix = crypto.randomBytes(16).toString('hex');
-    cb(null, `${uniqueSuffix}${path.extname(file.originalname)}`);
-  },
-});
-
 const attachmentFileFilter = (req, file, cb) => {
   if (!ALLOWED_ATTACHMENT_TYPES.has(file.mimetype)) {
     cb(ApiError.badRequest('Unsupported file type'));
@@ -64,8 +50,32 @@ const attachmentFileFilter = (req, file, cb) => {
   cb(null, true);
 };
 
-export const uploadAttachment = multer({
-  storage: attachmentStorage,
-  fileFilter: attachmentFileFilter,
-  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB per file
-});
+/**
+ * Creates a multer instance scoped to `uploads/<subdir>/`. Each module that
+ * needs file attachments (Leads, Tasks, ...) calls this once with its own
+ * subdirectory rather than each hand-rolling its own multer config.
+ */
+export const createAttachmentUploader = (subdir) => {
+  const dir = path.join(process.cwd(), 'uploads', subdir);
+  fs.mkdirSync(dir, { recursive: true });
+
+  const storage = multer.diskStorage({
+    destination: (req, file, cb) => cb(null, dir),
+    filename: (req, file, cb) => {
+      // Randomized filename on disk — never trust the client-provided name
+      // for the stored path (path traversal / collision safety). The
+      // human-readable original name is preserved separately in the DB.
+      const uniqueSuffix = crypto.randomBytes(16).toString('hex');
+      cb(null, `${uniqueSuffix}${path.extname(file.originalname)}`);
+    },
+  });
+
+  return multer({
+    storage,
+    fileFilter: attachmentFileFilter,
+    limits: { fileSize: 10 * 1024 * 1024 }, // 10MB per file
+  });
+};
+
+export const uploadAttachment = createAttachmentUploader('leads');
+export const uploadTaskAttachment = createAttachmentUploader('tasks');

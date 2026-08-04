@@ -4,6 +4,9 @@ import authRoutes from './auth.routes.js';
 import dashboardRoutes from './dashboard.routes.js';
 import customerRoutes from './customer.routes.js';
 import leadRoutes from './lead.routes.js';
+import taskRoutes from './task.routes.js';
+import followUpRoutes from './followup.routes.js';
+import userRoutes from './user.routes.js';
 
 const router = Router();
 
@@ -12,11 +15,11 @@ router.use('/auth', authRoutes);
 router.use('/dashboard', dashboardRoutes);
 router.use('/customers', customerRoutes);
 router.use('/leads', leadRoutes);
+router.use('/tasks', taskRoutes);
+router.use('/followups', followUpRoutes);
+router.use('/users', userRoutes);
 
-// Phase 6+: mounted here as each module ships
-// router.use('/tasks', taskRoutes);
-// router.use('/followups', followupRoutes);
+// Phase 7+: mounted here as each module ships
 // router.use('/reports', reportRoutes);
-// router.use('/users', userRoutes);
 
 export default router;

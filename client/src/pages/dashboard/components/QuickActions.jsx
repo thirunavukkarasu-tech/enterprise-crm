@@ -5,8 +5,8 @@ import { Card } from '../../../components/ui/Card.jsx';
 const ACTIONS = [
   { label: 'Add Customer', to: '/customers?new=1', icon: UserPlus, tone: 'bg-brand-50 text-brand-600' },
   { label: 'Add Lead', to: '/leads?new=1', icon: Target, tone: 'bg-amber-50 text-amber-600' },
-  { label: 'Create Task', to: '/tasks', icon: CheckSquare, tone: 'bg-brand-50 text-brand-600' },
-  { label: 'Log Follow-up', to: '/followups', icon: PhoneCall, tone: 'bg-amber-50 text-amber-600' },
+  { label: 'Create Task', to: '/tasks?new=1', icon: CheckSquare, tone: 'bg-brand-50 text-brand-600' },
+  { label: 'Log Follow-up', to: '/followups?new=1', icon: PhoneCall, tone: 'bg-amber-50 text-amber-600' },
 ];
 
 /**

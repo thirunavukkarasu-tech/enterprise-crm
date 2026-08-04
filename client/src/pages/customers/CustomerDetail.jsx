@@ -23,6 +23,7 @@ import { TagList } from './components/TagList.jsx';
 import { CustomerFormModal } from './components/CustomerFormModal.jsx';
 import { CustomerNotes } from './components/CustomerNotes.jsx';
 import { CustomerTimeline } from './components/CustomerTimeline.jsx';
+import { CustomerInteractionHistory } from './components/CustomerInteractionHistory.jsx';
 
 const getInitials = (name = '') =>
   name.split(' ').map((p) => p[0]).slice(0, 2).join('').toUpperCase();
@@ -153,13 +154,18 @@ export default function CustomerDetail() {
         </dl>
       </Card>
 
-      {/* Notes + Timeline */}
-      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+      {/* Notes + Interaction History + Timeline */}
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
         <Card>
           <CardHeader title="Notes" subtitle="Internal notes about this customer" />
           <div className="px-5 py-5">
             <CustomerNotes customerId={id} notes={customer.notes} onAdded={handleNoteAdded} />
           </div>
+        </Card>
+
+        <Card>
+          <CardHeader title="Interaction History" subtitle="Calls, meetings, and email follow-ups" />
+          <CustomerInteractionHistory customerId={id} />
         </Card>
 
         <Card>

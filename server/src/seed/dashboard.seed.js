@@ -3,13 +3,15 @@ import { Customer } from '../models/Customer.js';
 import { Lead } from '../models/Lead.js';
 import { Opportunity } from '../models/Opportunity.js';
 import { Task } from '../models/Task.js';
+import { FollowUp } from '../models/FollowUp.js';
 import { Activity } from '../models/Activity.js';
 import { Notification } from '../models/Notification.js';
 import {
   LEAD_STATUSES,
   LEAD_SOURCES,
   OPPORTUNITY_STAGES,
-  TASK_PRIORITIES,
+  TASK_CATEGORIES,
+  FOLLOWUP_TYPES,
 } from '../utils/enums.js';
 
 const pick = (arr) => arr[Math.floor(Math.random() * arr.length)];
@@ -105,28 +107,72 @@ export const seedDashboardData = async (salesUsers) => {
   console.log(`[seed:dashboard] Created ${opportunities.length} opportunities`);
 
   // --- Tasks -------------------------------------------------------------------
-  const tasks = Array.from({ length: 24 }).map(() => ({
-    title: pick([
-      'Follow up on proposal',
-      'Send contract for signature',
-      'Schedule product demo',
-      'Check in after onboarding',
-      'Prepare quarterly renewal quote',
-      'Call to confirm requirements',
-    ]),
-    description: faker.lorem.sentence(),
-    dueDate: faker.date.soon({ days: 21 }),
-    priority: pick(TASK_PRIORITIES),
-    status: pickWeighted([
-      ['pending', 5],
-      ['in_progress', 3],
-      ['completed', 2],
-    ]),
-    assignedTo: pick(salesUsers)._id,
-    createdAt: dateWithinLastMonths(1),
-  }));
+  const TASK_TITLES_BY_CATEGORY = {
+    call: ['Call to confirm requirements', 'Follow-up call after demo'],
+    email: ['Send contract for signature', 'Email pricing breakdown'],
+    meeting: ['Schedule product demo', 'Quarterly business review meeting'],
+    demo: ['Prepare product demo environment'],
+    proposal: ['Prepare quarterly renewal quote', 'Draft proposal for expansion'],
+    administrative: ['Update CRM records', 'File signed contract'],
+    other: ['Check in after onboarding'],
+  };
+  const tasks = Array.from({ length: 30 }).map(() => {
+    const category = pick(TASK_CATEGORIES);
+    return {
+      title: pick(TASK_TITLES_BY_CATEGORY[category]),
+      description: faker.lorem.sentence(),
+      dueDate: faker.date.soon({ days: 21 }),
+      priority: pickWeighted([
+        ['low', 3],
+        ['medium', 5],
+        ['high', 3],
+        ['critical', 1],
+      ]),
+      category,
+      status: pickWeighted([
+        ['pending', 5],
+        ['in_progress', 3],
+        ['completed', 3],
+        ['cancelled', 1],
+      ]),
+      assignedTo: pick(salesUsers)._id,
+      relatedCustomer: Math.random() > 0.4 ? pick(insertedCustomers)._id : undefined,
+      createdAt: dateWithinLastMonths(1),
+    };
+  });
   await Task.insertMany(tasks);
   console.log(`[seed:dashboard] Created ${tasks.length} tasks`);
+
+  // --- Follow-ups -------------------------------------------------------------------
+  const followUpSubjectsByType = {
+    call: ['Check-in call', 'Discovery call', 'Renewal discussion call'],
+    meeting: ['Onboarding kickoff', 'Quarterly review', 'Contract negotiation meeting'],
+    email: ['Pricing follow-up email', 'Post-demo follow-up email'],
+  };
+  const followUps = Array.from({ length: 35 }).map(() => {
+    const type = pick(FOLLOWUP_TYPES);
+    const scheduledAt = Math.random() > 0.5 ? faker.date.soon({ days: 14 }) : dateWithinLastMonths(2);
+    const isPast = scheduledAt < new Date();
+    return {
+      type,
+      subject: pick(followUpSubjectsByType[type]),
+      notes: faker.lorem.sentence(),
+      scheduledAt,
+      durationMinutes: type === 'email' ? undefined : pick([15, 30, 45, 60]),
+      status: isPast
+        ? pickWeighted([
+            ['completed', 6],
+            ['no_show', 1],
+            ['cancelled', 1],
+          ])
+        : 'scheduled',
+      relatedCustomer: pick(insertedCustomers)._id,
+      assignedTo: pick(salesUsers)._id,
+      createdAt: dateWithinLastMonths(2),
+    };
+  });
+  await FollowUp.insertMany(followUps);
+  console.log(`[seed:dashboard] Created ${followUps.length} follow-ups`);
 
   // --- Activities -------------------------------------------------------------------
   const activityTemplates = [

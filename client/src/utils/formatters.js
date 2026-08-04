@@ -47,3 +47,14 @@ export const formatDueDate = (date) => {
   if (diffDays <= 7) return `In ${diffDays}d`;
   return new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 };
+
+/** Full date + time — used for follow-up scheduling ("Oct 4, 2:30 PM"). */
+export const formatDateTime = (date) => {
+  if (!date) return '';
+  return new Date(date).toLocaleString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit',
+  });
+};

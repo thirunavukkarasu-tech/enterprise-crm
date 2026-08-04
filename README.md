@@ -5,11 +5,12 @@ enterprise full-stack engineering practices: clean architecture, RBAC, and a
 scalable module system — built with **React 19**, **Node.js/Express**, and
 **MongoDB**.
 
-> 🚧 **Status: Phase 5 — Lead Management.** Foundation, Authentication,
-> Dashboard, Customer Management, and a full Lead Management module (status/
-> source/priority, assignment, notes, attachments, activity timeline, lead →
-> customer conversion, server-side pagination/search/filter) are complete.
-> Remaining modules ship in subsequent phases — see [Roadmap](#roadmap).
+> 🚧 **Status: Phase 6 — Task & Follow-up Management.** Foundation,
+> Authentication, Dashboard, Customer Management, Lead Management, and a
+> full Task & Follow-up module (priority/category/status, assignment,
+> comments, attachments, reminders, activity timeline, scheduled calls/
+> meetings/emails, customer interaction history) are complete. Remaining
+> modules ship in subsequent phases — see [Roadmap](#roadmap).
 
 ## Tech Stack
 
@@ -83,7 +84,9 @@ cd client && npm run dev     # http://localhost:5173
 Full endpoint reference: [`docs/API_AUTH.md`](./docs/API_AUTH.md) ·
 [`docs/API_DASHBOARD.md`](./docs/API_DASHBOARD.md) ·
 [`docs/API_CUSTOMERS.md`](./docs/API_CUSTOMERS.md) ·
-[`docs/API_LEADS.md`](./docs/API_LEADS.md).
+[`docs/API_LEADS.md`](./docs/API_LEADS.md) ·
+[`docs/API_TASKS.md`](./docs/API_TASKS.md) ·
+[`docs/API_FOLLOWUPS.md`](./docs/API_FOLLOWUPS.md).
 
 The Vite dev server proxies `/api` requests to the Express server (see
 `client/vite.config.js`), so the frontend can simply call `/api/v1/...`.
@@ -103,11 +106,10 @@ Mono (data) typefaces. Tokens live in `client/tailwind.config.js`.
 - [x] **Phase 3** — Dashboard (KPI cards, sales pipeline, revenue & lead analytics, activity timeline, tasks, notifications, top performers, customer growth)
 - [x] **Phase 4** — Customer Management (CRUD, soft delete, notes, tags, timeline, search/filter/pagination, CSV import/export)
 - [x] **Phase 5** — Lead Management (status, source, priority, assignment, notes, attachments, timeline, lead → customer conversion)
-- [ ] **Phase 6** — Task Management (create/assign, due dates, priority, status tracking)
-- [ ] **Phase 7** — Follow-up Management (call logs, meetings, notes, reminders)
-- [ ] **Phase 8** — Reports (sales, customer, lead, dashboard analytics)
-- [ ] **Phase 9** — Settings (profile, change password, roles & permissions)
-- [ ] **Phase 10** — Deployment, API documentation, polish
+- [x] **Phase 6** — Task & Follow-up Management (priority/category/status, assignment, comments, attachments, reminders, timeline, scheduled calls/meetings/emails, customer interaction history)
+- [ ] **Phase 7** — Reports (sales, customer, lead, dashboard analytics)
+- [ ] **Phase 8** — Settings (profile, change password, roles & permissions)
+- [ ] **Phase 9** — Deployment, API documentation, polish
 
 ## License
 

@@ -3,3 +3,5 @@
 !.gitignore
 !leads/
 !leads/.gitkeep
+!tasks/
+!tasks/.gitkeep

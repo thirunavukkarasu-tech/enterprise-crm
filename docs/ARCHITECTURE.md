@@ -248,9 +248,46 @@ this design leaves room to introduce TanStack Query without a rewrite.
   lead's timeline) share one write path and one collection instead of each
   module inventing its own history mechanism.
 
-## 10. Why This Scales to the Full Module List
+## 10. Task & Follow-up Management Architecture (Phase 6 additions)
 
-Every remaining module (Tasks, Follow-ups, Reports, Settings)
+- **Two related but distinct entities, not one**: a `Task` is open-ended
+  work (comments thread, attachments, arbitrary due date) while a
+  `FollowUp` is a single scheduled interaction (call/meeting/email) with
+  one notes field. Modeling them as one entity with an optional "type"
+  flag was considered and rejected — their shapes and lifecycles diverge
+  enough (attachments/comments vs. duration/interaction-type) that a
+  shared schema would need constant `if (type === ...)` branching in both
+  the model and every consumer.
+- **The `/users` endpoint was added reactively, not planned upfront**: the
+  Customer and Lead modules (Phases 4–5) supported `assignedTo` in the
+  API but never exposed a picker in the UI. Phase 6 explicitly requires
+  "assign task to sales representative," which exposed that gap — so a
+  minimal `GET /api/v1/users` (Admin/HR/Manager only, active users'
+  name/email/role) was added to power it, and reused by the Follow-up
+  form. Customer/Lead forms weren't retrofitted with the same picker in
+  this phase to keep the change scoped to what was actually requested;
+  it's a natural small addition when those modules are revisited.
+- **Reminders as a sweep, not a scheduled job per record**: rather than
+  scheduling an individual timer per `reminderAt` (which doesn't survive
+  a server restart and doesn't scale past a handful of in-memory timers),
+  a single `node-cron` job polls every minute for anything due. This is
+  explicitly called out as the first thing that would need to change
+  (to a distributed queue like BullMQ+Redis) if the API needed to run as
+  more than one instance — see `server/src/jobs/reminderSweep.js`.
+- **One-click status toggles alongside full edit**: both the Task list and
+  the Follow-up list expose a quick "complete" action directly on the row
+  (not just inside the edit modal), because "mark this done" is by far the
+  most frequent interaction with a task/follow-up — burying it inside a
+  modal would add friction to the single most common action.
+- **Customer Interaction History is a read of the same collection, not a
+  separate feature**: `GET /followups/customer/:customerId` is the same
+  `FollowUp` model and service, just pre-filtered — reinforcing the
+  established pattern (see §8, §9) of one collection serving multiple UI
+  surfaces rather than each surface inventing its own data shape.
+
+## 11. Why This Scales to the Full Module List
+
+Every remaining module (Reports, Settings)
 plugs into the same skeleton: a Mongoose model, a validator, a service, a
 controller, a router mounted in `app.js`, and a `pages/<module>` folder on the
 frontend with its own service file. Phase 1 exists so that from Phase 2 onward,

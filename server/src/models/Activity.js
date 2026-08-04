@@ -15,6 +15,8 @@ const activitySchema = new mongoose.Schema(
     actor: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true, index: true },
     relatedCustomer: { type: mongoose.Schema.Types.ObjectId, ref: 'Customer', index: true },
     relatedLead: { type: mongoose.Schema.Types.ObjectId, ref: 'Lead', index: true },
+    relatedTask: { type: mongoose.Schema.Types.ObjectId, ref: 'Task', index: true },
+    relatedFollowUp: { type: mongoose.Schema.Types.ObjectId, ref: 'FollowUp', index: true },
     metadata: { type: mongoose.Schema.Types.Mixed }, // e.g. { leadId, amount }
   },
   { timestamps: true }
@@ -23,5 +25,7 @@ const activitySchema = new mongoose.Schema(
 activitySchema.index({ createdAt: -1 });
 activitySchema.index({ relatedCustomer: 1, createdAt: -1 });
 activitySchema.index({ relatedLead: 1, createdAt: -1 });
+activitySchema.index({ relatedTask: 1, createdAt: -1 });
+activitySchema.index({ relatedFollowUp: 1, createdAt: -1 });
 
 export const Activity = mongoose.model('Activity', activitySchema);
