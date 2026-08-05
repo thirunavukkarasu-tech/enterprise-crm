@@ -5,12 +5,12 @@ enterprise full-stack engineering practices: clean architecture, RBAC, and a
 scalable module system — built with **React 19**, **Node.js/Express**, and
 **MongoDB**.
 
-> 🚧 **Status: Phase 6 — Task & Follow-up Management.** Foundation,
-> Authentication, Dashboard, Customer Management, Lead Management, and a
-> full Task & Follow-up module (priority/category/status, assignment,
-> comments, attachments, reminders, activity timeline, scheduled calls/
-> meetings/emails, customer interaction history) are complete. Remaining
-> modules ship in subsequent phases — see [Roadmap](#roadmap).
+> 🚧 **Status: Phase 7 — Reports & Analytics.** Foundation, Authentication,
+> Dashboard, Customer Management, Lead Management, Task & Follow-up
+> Management, and a full Reports module (sales/customer/lead/task reports,
+> interactive Recharts visualizations, date-range filtering, CSV/Excel
+> export, print-friendly layout) are complete. Remaining modules ship in
+> subsequent phases — see [Roadmap](#roadmap).
 
 ## Tech Stack
 
@@ -86,7 +86,8 @@ Full endpoint reference: [`docs/API_AUTH.md`](./docs/API_AUTH.md) ·
 [`docs/API_CUSTOMERS.md`](./docs/API_CUSTOMERS.md) ·
 [`docs/API_LEADS.md`](./docs/API_LEADS.md) ·
 [`docs/API_TASKS.md`](./docs/API_TASKS.md) ·
-[`docs/API_FOLLOWUPS.md`](./docs/API_FOLLOWUPS.md).
+[`docs/API_FOLLOWUPS.md`](./docs/API_FOLLOWUPS.md) ·
+[`docs/API_REPORTS.md`](./docs/API_REPORTS.md).
 
 The Vite dev server proxies `/api` requests to the Express server (see
 `client/vite.config.js`), so the frontend can simply call `/api/v1/...`.
@@ -107,7 +108,7 @@ Mono (data) typefaces. Tokens live in `client/tailwind.config.js`.
 - [x] **Phase 4** — Customer Management (CRUD, soft delete, notes, tags, timeline, search/filter/pagination, CSV import/export)
 - [x] **Phase 5** — Lead Management (status, source, priority, assignment, notes, attachments, timeline, lead → customer conversion)
 - [x] **Phase 6** — Task & Follow-up Management (priority/category/status, assignment, comments, attachments, reminders, timeline, scheduled calls/meetings/emails, customer interaction history)
-- [ ] **Phase 7** — Reports (sales, customer, lead, dashboard analytics)
+- [x] **Phase 7** — Reports & Analytics (sales/customer/lead/task reports, interactive charts, date-range filters, CSV/Excel export, print-friendly)
 - [ ] **Phase 8** — Settings (profile, change password, roles & permissions)
 - [ ] **Phase 9** — Deployment, API documentation, polish
 

@@ -7,6 +7,7 @@ import leadRoutes from './lead.routes.js';
 import taskRoutes from './task.routes.js';
 import followUpRoutes from './followup.routes.js';
 import userRoutes from './user.routes.js';
+import reportRoutes from './report.routes.js';
 
 const router = Router();
 
@@ -18,8 +19,9 @@ router.use('/leads', leadRoutes);
 router.use('/tasks', taskRoutes);
 router.use('/followups', followUpRoutes);
 router.use('/users', userRoutes);
+router.use('/reports', reportRoutes);
 
-// Phase 7+: mounted here as each module ships
-// router.use('/reports', reportRoutes);
+// Phase 8+: mounted here as each module ships
+// router.use('/settings', settingsRoutes);
 
 export default router;

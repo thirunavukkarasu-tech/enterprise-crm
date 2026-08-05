@@ -285,9 +285,50 @@ this design leaves room to introduce TanStack Query without a rewrite.
   established pattern (see §8, §9) of one collection serving multiple UI
   surfaces rather than each surface inventing its own data shape.
 
-## 11. Why This Scales to the Full Module List
+## 11. Reports & Analytics Architecture (Phase 7 additions)
 
-Every remaining module (Reports, Settings)
+- **`$facet` aggregations over multiple queries**: every report endpoint
+  computes several breakdowns of the same collection (trend, totals,
+  previous-period comparison, per-rep pivot) in a single `$facet`
+  aggregation rather than four sequential queries — one round-trip to
+  MongoDB instead of four, and a consistent read snapshot across all the
+  breakdowns in that one response.
+- **Reports vs. Dashboard: different aggregation shapes for different
+  jobs.** The Dashboard (Phase 3) answers "what does today look like" with
+  nine small, independently-loading endpoints against a fixed recent
+  window. Reports answers "show me this metric over a date range I
+  choose" — so `report.service.js` generalizes the Dashboard's month-
+  bucket gap-filling (`lastNMonths`) into an arbitrary-range version
+  (`buildPeriodBuckets`) and extracts the shared `percentChange` helper
+  both now import, rather than each duplicating that math.
+- **Report data vs. export data are different shapes on purpose**: a
+  report returns pre-aggregated numbers shaped for a chart; an export
+  returns the underlying records shaped for a spreadsheet. Conflating them
+  — e.g. exporting the chart's monthly totals instead of the actual deals
+  — would produce a file a manager can't actually pivot or audit against.
+  See `docs/API_REPORTS.md`.
+- **A registry of exporters, not a switch statement per format**: adding a
+  fifth exportable report type means adding one entry to the `EXPORTERS`
+  map in `reportExport.service.js` (columns + fetch + row-mapper), not
+  touching the CSV/XLSX generation code in `utils/exporters.js` at all —
+  those two functions only know about `{ columns, rows }`, never about
+  Sales/Customers/Leads/Tasks specifically.
+- **Print support via CSS, not a second view**: "print-friendly reports"
+  is implemented as `print:` Tailwind variants on the existing page (hide
+  the sidebar/navbar/filters, let the content flow naturally) rather than
+  a parallel print-only template — one source of truth for the report's
+  markup, styled differently for two output targets.
+- **A pragmatic, documented duplication**: `components/ui/ChartCard.jsx`
+  duplicates `pages/dashboard/components/ChartCard.jsx` (same loading/
+  error/empty state machine) instead of refactoring the Dashboard to
+  import a shared copy. The Dashboard was reviewed and shipped in Phase 3;
+  touching eight already-working files for a cosmetic dedupe carried more
+  regression risk than the duplication costs. Noted in the component's
+  own docstring as a known follow-up, not silently left unexplained.
+
+## 12. Why This Scales to the Full Module List
+
+Every remaining module (Settings)
 plugs into the same skeleton: a Mongoose model, a validator, a service, a
 controller, a router mounted in `app.js`, and a `pages/<module>` folder on the
 frontend with its own service file. Phase 1 exists so that from Phase 2 onward,

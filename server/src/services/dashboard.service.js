@@ -8,12 +8,7 @@ import { scopeToUser } from '../utils/scope.js';
 import { lastNMonths } from '../utils/dateRange.js';
 import { LEAD_STATUSES, OPPORTUNITY_STAGES } from '../utils/enums.js';
 import { ROLES } from '../utils/roles.js';
-
-const percentChange = (current, previous) => {
-  if (previous === 0) return current === 0 ? 0 : 100;
-  return Math.round(((current - previous) / previous) * 1000) / 10; // one decimal place
-};
-
+import { percentChange } from '../utils/percentChange.js';
 const monthBounds = (offset = 0) => {
   const now = new Date();
   const start = new Date(now.getFullYear(), now.getMonth() - offset, 1);

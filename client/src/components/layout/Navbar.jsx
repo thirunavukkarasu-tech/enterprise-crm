@@ -35,7 +35,7 @@ export const Navbar = ({ onMenuClick }) => {
   const displayRole = user?.role ? ROLE_LABELS[user.role] : 'Not signed in';
 
   return (
-    <header className="sticky top-0 z-20 flex h-16 items-center gap-4 border-b border-surface-300 bg-surface-100 px-4 lg:px-6">
+    <header className="sticky top-0 z-20 flex h-16 items-center gap-4 border-b border-surface-300 bg-surface-100 px-4 lg:px-6 print:hidden">
       <button
         type="button"
         onClick={onMenuClick}
