@@ -6,6 +6,7 @@ import { asyncHandler } from '../middleware/asyncHandler.js';
 import { hashToken } from '../utils/hashToken.js';
 import { sendPasswordResetEmail } from '../utils/email.js';
 import { env } from '../config/env.js';
+import { logAudit } from '../services/audit.service.js';
 
 const REFRESH_COOKIE_NAME = 'refreshToken';
 
@@ -28,6 +29,10 @@ const sanitizeUser = (user) => ({
   name: user.name,
   email: user.email,
   role: user.role,
+  avatarUrl: user.avatarUrl,
+  phone: user.phone,
+  jobTitle: user.jobTitle,
+  preferences: user.preferences,
   lastLoginAt: user.lastLoginAt,
 });
 
@@ -46,19 +51,46 @@ const issueSession = async (user, res) => {
 // POST /api/v1/auth/login
 export const login = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
+  const ip = req.ip;
+  const userAgent = req.headers['user-agent'];
 
   const user = await User.findOne({ email }).select('+password');
   if (!user || !(await user.comparePassword(password))) {
+    await logAudit({
+      actorEmail: email,
+      action: 'login_failed',
+      description: `Failed login attempt for ${email}`,
+      ip,
+      userAgent,
+    });
     throw ApiError.unauthorized('Invalid email or password');
   }
 
   if (!user.isActive) {
+    await logAudit({
+      actor: user._id,
+      actorEmail: user.email,
+      action: 'login_failed',
+      description: `Login rejected — account deactivated (${user.email})`,
+      ip,
+      userAgent,
+    });
     throw ApiError.forbidden('This account has been deactivated. Contact your administrator.');
   }
 
   const accessToken = await issueSession(user, res);
   user.lastLoginAt = new Date();
+  user.lastLoginIp = ip;
   await user.save({ validateBeforeSave: false });
+
+  await logAudit({
+    actor: user._id,
+    actorEmail: user.email,
+    action: 'login_success',
+    description: `${user.name} logged in`,
+    ip,
+    userAgent,
+  });
 
   new ApiResponse(200, { accessToken, user: sanitizeUser(user) }, 'Logged in successfully').send(res);
 });
@@ -105,7 +137,17 @@ export const logout = asyncHandler(async (req, res) => {
   if (token) {
     try {
       const decoded = jwt.verify(token, env.jwtRefreshSecret);
-      await User.findByIdAndUpdate(decoded.sub, { $unset: { refreshTokenHash: 1 } });
+      const user = await User.findByIdAndUpdate(decoded.sub, { $unset: { refreshTokenHash: 1 } });
+      if (user) {
+        await logAudit({
+          actor: user._id,
+          actorEmail: user.email,
+          action: 'logout',
+          description: `${user.name} logged out`,
+          ip: req.ip,
+          userAgent: req.headers['user-agent'],
+        });
+      }
     } catch (err) {
       // Token already invalid/expired — nothing to revoke server-side, still clear the cookie.
     }
@@ -159,6 +201,15 @@ export const resetPassword = asyncHandler(async (req, res) => {
   user.passwordResetExpires = undefined;
   user.refreshTokenHash = undefined; // revoke any existing session on password reset
   await user.save();
+
+  await logAudit({
+    actor: user._id,
+    actorEmail: user.email,
+    action: 'password_changed',
+    description: `${user.name} reset their password via email link`,
+    ip: req.ip,
+    userAgent: req.headers['user-agent'],
+  });
 
   new ApiResponse(200, null, 'Password reset successfully. Please log in with your new password.').send(res);
 });

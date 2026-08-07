@@ -46,6 +46,16 @@ export const AuthProvider = ({ children }) => {
     }
   }, []);
 
+  /**
+   * Merges a partial user update into the cached session — used after
+   * Settings > Profile/Preferences saves (name, avatarUrl, theme, ...) so
+   * the Navbar and everywhere else reading `user` from this context update
+   * immediately, without requiring a full page reload or re-login.
+   */
+  const updateUser = useCallback((patch) => {
+    setUser((prev) => (prev ? { ...prev, ...patch } : prev));
+  }, []);
+
   const value = useMemo(
     () => ({
       user,
@@ -53,8 +63,9 @@ export const AuthProvider = ({ children }) => {
       isLoading,
       login,
       logout,
+      updateUser,
     }),
-    [user, isLoading, login, logout]
+    [user, isLoading, login, logout, updateUser]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

@@ -5,6 +5,7 @@ import { Customer } from '../models/Customer.js';
 import { Activity } from '../models/Activity.js';
 import { ApiError } from '../utils/ApiError.js';
 import { ROLES } from '../utils/roles.js';
+import { notifyUser } from './notification.service.js';
 
 const escapeRegex = (str) => str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
@@ -93,6 +94,14 @@ export const createLead = async (user, payload) => {
     user.role !== ROLES.EMPLOYEE && payload.assignedTo ? payload.assignedTo : user._id;
 
   const lead = await Lead.create({ ...payload, assignedTo });
+
+  if (assignedTo.toString() !== user._id.toString()) {
+    await notifyUser(assignedTo, {
+      type: 'lead',
+      title: 'New lead assigned to you',
+      message: `${user.name} assigned you "${lead.name}"`,
+    });
+  }
 
   await logActivity('lead_created', `${user.name} added lead "${lead.name}"`, user, lead._id);
 

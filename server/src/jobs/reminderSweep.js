@@ -1,7 +1,7 @@
 import cron from 'node-cron';
 import { Task } from '../models/Task.js';
 import { FollowUp } from '../models/FollowUp.js';
-import { Notification } from '../models/Notification.js';
+import { notifyUser } from '../services/notification.service.js';
 
 /**
  * Single-process reminder sweep: every minute, find Tasks/FollowUps whose
@@ -27,13 +27,14 @@ const sweepTaskReminders = async () => {
 
   if (dueTasks.length === 0) return;
 
-  await Notification.insertMany(
-    dueTasks.map((task) => ({
-      user: task.assignedTo,
-      type: 'task',
-      title: 'Task reminder',
-      message: `"${task.title}" is due ${new Date(task.dueDate).toLocaleDateString()}`,
-    }))
+  await Promise.all(
+    dueTasks.map((task) =>
+      notifyUser(task.assignedTo, {
+        type: 'task',
+        title: 'Task reminder',
+        message: `"${task.title}" is due ${new Date(task.dueDate).toLocaleDateString()}`,
+      })
+    )
   );
 
   await Task.updateMany({ _id: { $in: dueTasks.map((t) => t._id) } }, { $set: { reminderSent: true } });
@@ -50,13 +51,14 @@ const sweepFollowUpReminders = async () => {
 
   if (dueFollowUps.length === 0) return;
 
-  await Notification.insertMany(
-    dueFollowUps.map((f) => ({
-      user: f.assignedTo,
-      type: 'followup',
-      title: `Upcoming ${f.type}`,
-      message: `"${f.subject}" is scheduled for ${new Date(f.scheduledAt).toLocaleString()}`,
-    }))
+  await Promise.all(
+    dueFollowUps.map((f) =>
+      notifyUser(f.assignedTo, {
+        type: 'followup',
+        title: `Upcoming ${f.type}`,
+        message: `"${f.subject}" is scheduled for ${new Date(f.scheduledAt).toLocaleString()}`,
+      })
+    )
   );
 
   await FollowUp.updateMany(

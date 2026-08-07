@@ -7,7 +7,6 @@ import {
   BarChart3,
   Settings,
 } from 'lucide-react';
-import { ROLES } from './roles.js';
 
 /**
  * Single source of truth for sidebar navigation. Each module registers one
@@ -28,6 +27,5 @@ export const NAV_ITEMS = [
     label: 'Settings',
     to: '/settings',
     icon: Settings,
-    roles: [ROLES.ADMIN],
   },
 ];

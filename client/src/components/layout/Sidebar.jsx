@@ -28,7 +28,7 @@ export const Sidebar = ({ isOpen, onClose }) => {
       {/* Mobile scrim */}
       {isOpen && (
         <div
-          className="fixed inset-0 z-30 bg-ink/50 lg:hidden"
+          className="fixed inset-0 z-30 bg-sidebar/50 lg:hidden"
           onClick={onClose}
           aria-hidden="true"
         />
@@ -36,7 +36,7 @@ export const Sidebar = ({ isOpen, onClose }) => {
 
       <aside
         className={clsx(
-          'fixed inset-y-0 left-0 z-40 flex w-64 shrink-0 flex-col bg-ink transition-transform duration-200 lg:static lg:translate-x-0 print:hidden',
+          'fixed inset-y-0 left-0 z-40 flex w-64 shrink-0 flex-col bg-sidebar transition-transform duration-200 lg:static lg:translate-x-0 print:hidden',
           isOpen ? 'translate-x-0' : '-translate-x-full'
         )}
       >
@@ -48,7 +48,7 @@ export const Sidebar = ({ isOpen, onClose }) => {
           <button
             type="button"
             onClick={onClose}
-            className="text-surface-300 hover:text-white lg:hidden"
+            className="text-sidebar-fg hover:text-white lg:hidden"
             aria-label="Close navigation"
           >
             <X className="h-5 w-5" />
@@ -64,8 +64,8 @@ export const Sidebar = ({ isOpen, onClose }) => {
                 clsx(
                   'group flex items-center gap-3 rounded-lg border-l-2 px-3 py-2.5 text-sm font-medium transition-colors',
                   isActive
-                    ? 'border-brand-500 bg-ink-700 text-white'
-                    : 'border-transparent text-surface-300/80 hover:bg-ink-700 hover:text-white'
+                    ? 'border-brand-500 bg-sidebar-700 text-white'
+                    : 'border-transparent text-sidebar-fg/80 hover:bg-sidebar-700 hover:text-white'
                 )
               }
             >
@@ -75,8 +75,8 @@ export const Sidebar = ({ isOpen, onClose }) => {
           ))}
         </nav>
 
-        <div className="border-t border-ink-700 px-5 py-4">
-          <p className="text-xs text-surface-300/60">CRM Platform v1.0.0</p>
+        <div className="border-t border-sidebar-700 px-5 py-4">
+          <p className="text-xs text-sidebar-fg/60">CRM Platform v1.0.0</p>
         </div>
       </aside>
     </>

@@ -33,7 +33,7 @@ export const Modal = ({ isOpen, onClose, title, size = 'md', children, footer })
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4" role="dialog" aria-modal="true">
-      <div className="absolute inset-0 bg-ink/50 animate-fade-in-up" onClick={onClose} aria-hidden="true" />
+      <div className="absolute inset-0 bg-sidebar/50 animate-fade-in-up" onClick={onClose} aria-hidden="true" />
       <div
         className={clsx(
           'relative w-full animate-fade-in-up rounded-xl bg-surface-100 shadow-popover',

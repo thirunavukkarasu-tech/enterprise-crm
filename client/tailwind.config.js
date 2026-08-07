@@ -1,5 +1,17 @@
 /** @type {import('tailwindcss').Config} */
+
+/**
+ * `ink` and `surface` resolve through CSS custom properties (defined in
+ * src/styles/index.css for :root and .dark) so light/dark theming applies
+ * app-wide via one class toggle on <html>, without every component needing
+ * a `dark:` variant — see docs/ARCHITECTURE.md §12. The `<alpha-value>`
+ * placeholder is Tailwind's documented pattern for keeping opacity
+ * modifiers (e.g. `text-ink-600/50`) working with CSS-variable colors.
+ */
+const themedColor = (varName) => `rgb(var(${varName}) / <alpha-value>)`;
+
 export default {
+  darkMode: 'class',
   content: ['./index.html', './src/**/*.{js,jsx}'],
   theme: {
     extend: {
@@ -8,17 +20,25 @@ export default {
         // a single teal "signal" accent reserved for primary actions and
         // active pipeline states. See docs/ARCHITECTURE.md / design notes.
         ink: {
-          DEFAULT: '#12141C',
-          800: '#1B1E2A',
-          700: '#242838',
-          600: '#2E3346',
+          DEFAULT: themedColor('--color-ink'),
+          800: themedColor('--color-ink-800'),
+          700: themedColor('--color-ink-700'),
+          600: themedColor('--color-ink-600'),
         },
         surface: {
-          DEFAULT: '#F5F6FA',
-          100: '#FFFFFF',
-          200: '#EEF0F6',
-          300: '#E3E6EF',
+          DEFAULT: themedColor('--color-surface'),
+          100: themedColor('--color-surface-100'),
+          200: themedColor('--color-surface-200'),
+          300: themedColor('--color-surface-300'),
         },
+        // Fixed — the sidebar is always dark regardless of the app theme
+        // (a deliberate Phase 1 design signature), so it deliberately does
+        // NOT use the themed `ink` tokens above, which flip in dark mode.
+        sidebar: {
+          DEFAULT: '#12141C',
+          700: '#242838',
+        },
+        'sidebar-fg': '#E3E6EF',
         brand: {
           50: '#EEFCFB',
           100: '#D2F6F3',

@@ -1,8 +1,10 @@
 import { useState, useRef, useEffect } from 'react';
-import { Menu, Search, Bell, ChevronDown, LogOut, UserRound, Settings } from 'lucide-react';
+import { Menu, Search, ChevronDown, LogOut, UserRound, Settings } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext.jsx';
 import { ROLE_LABELS } from '../../utils/roles.js';
+import { NotificationCenter } from './NotificationCenter.jsx';
+import { ThemeToggle } from './ThemeToggle.jsx';
 
 const getInitials = (name = '') =>
   name
@@ -54,15 +56,9 @@ export const Navbar = ({ onMenuClick }) => {
         />
       </div>
 
-      <div className="flex flex-1 items-center justify-end gap-3">
-        <button
-          type="button"
-          className="relative rounded-full p-2 text-ink-700 hover:bg-surface-200"
-          aria-label="Notifications"
-        >
-          <Bell className="h-5 w-5" />
-          <span className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-rose-500" />
-        </button>
+      <div className="flex flex-1 items-center justify-end gap-1.5">
+        <ThemeToggle />
+        <NotificationCenter />
 
         <div className="relative" ref={menuRef}>
           <button
@@ -70,8 +66,12 @@ export const Navbar = ({ onMenuClick }) => {
             onClick={() => setMenuOpen((o) => !o)}
             className="flex items-center gap-2 rounded-lg py-1.5 pl-1.5 pr-2.5 hover:bg-surface-200"
           >
-            <span className="flex h-8 w-8 items-center justify-center rounded-full bg-brand-500 text-xs font-semibold text-white">
-              {getInitials(displayName) || <UserRound className="h-4 w-4" />}
+            <span className="flex h-8 w-8 items-center justify-center overflow-hidden rounded-full bg-brand-500 text-xs font-semibold text-white">
+              {user?.avatarUrl ? (
+                <img src={user.avatarUrl} alt={displayName} className="h-full w-full object-cover" />
+              ) : (
+                getInitials(displayName) || <UserRound className="h-4 w-4" />
+              )}
             </span>
             <span className="hidden text-left sm:block">
               <span className="block text-sm font-medium leading-tight text-ink-800">{displayName}</span>

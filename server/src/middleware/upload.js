@@ -42,20 +42,18 @@ const ALLOWED_ATTACHMENT_TYPES = new Set([
   'text/csv',
 ]);
 
-const attachmentFileFilter = (req, file, cb) => {
-  if (!ALLOWED_ATTACHMENT_TYPES.has(file.mimetype)) {
-    cb(ApiError.badRequest('Unsupported file type'));
-    return;
-  }
-  cb(null, true);
-};
+const IMAGE_TYPES = new Set(['image/png', 'image/jpeg', 'image/webp']);
 
 /**
  * Creates a multer instance scoped to `uploads/<subdir>/`. Each module that
  * needs file attachments (Leads, Tasks, ...) calls this once with its own
  * subdirectory rather than each hand-rolling its own multer config.
+ *
+ * `allowedTypes`/`maxSizeMB` let a caller narrow the defaults — used by
+ * the avatar uploader below, since a profile picture should be an image
+ * under a couple MB, not any of the general attachment types up to 10MB.
  */
-export const createAttachmentUploader = (subdir) => {
+export const createAttachmentUploader = (subdir, { allowedTypes = ALLOWED_ATTACHMENT_TYPES, maxSizeMB = 10 } = {}) => {
   const dir = path.join(process.cwd(), 'uploads', subdir);
   fs.mkdirSync(dir, { recursive: true });
 
@@ -70,12 +68,21 @@ export const createAttachmentUploader = (subdir) => {
     },
   });
 
+  const scopedFileFilter = (req, file, cb) => {
+    if (!allowedTypes.has(file.mimetype)) {
+      cb(ApiError.badRequest('Unsupported file type'));
+      return;
+    }
+    cb(null, true);
+  };
+
   return multer({
     storage,
-    fileFilter: attachmentFileFilter,
-    limits: { fileSize: 10 * 1024 * 1024 }, // 10MB per file
+    fileFilter: scopedFileFilter,
+    limits: { fileSize: maxSizeMB * 1024 * 1024 },
   });
 };
 
 export const uploadAttachment = createAttachmentUploader('leads');
 export const uploadTaskAttachment = createAttachmentUploader('tasks');
+export const uploadAvatar = createAttachmentUploader('avatars', { allowedTypes: IMAGE_TYPES, maxSizeMB: 2 });

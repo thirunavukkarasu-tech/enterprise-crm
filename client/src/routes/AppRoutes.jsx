@@ -3,7 +3,6 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import { AuthLayout } from '../layouts/AuthLayout.jsx';
 import { DashboardLayout } from '../layouts/DashboardLayout.jsx';
 import { ProtectedRoute } from '../components/common/ProtectedRoute.jsx';
-import { ROLES } from '../utils/roles.js';
 
 import Login from '../pages/auth/Login.jsx';
 import ForgotPassword from '../pages/auth/ForgotPassword.jsx';
@@ -49,11 +48,7 @@ export const AppRoutes = () => {
           <Route path="/tasks/:id" element={<TaskDetail />} />
           <Route path="/followups" element={<Followups />} />
           <Route path="/reports/*" element={<Reports />} />
-
-          {/* Admin only */}
-          <Route element={<ProtectedRoute allowedRoles={[ROLES.ADMIN]} />}>
-            <Route path="/settings/*" element={<Settings />} />
-          </Route>
+          <Route path="/settings/*" element={<Settings />} />
         </Route>
       </Route>
 

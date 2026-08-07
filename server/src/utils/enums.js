@@ -100,4 +100,28 @@ export const ACTIVITY_TYPES = Object.freeze([
   'note_added',
 ]);
 
-export const NOTIFICATION_TYPES = Object.freeze(['task', 'lead', 'opportunity', 'followup', 'system']);
+export const NOTIFICATION_TYPES = Object.freeze([
+  'task',
+  'lead',
+  'opportunity',
+  'followup',
+  'security',
+  'admin',
+  'system',
+]);
+
+// Actions recorded in the audit log — covers both admin/user-management
+// actions and authentication events (the latter doubling as login history,
+// see docs/API_ADMIN.md).
+export const AUDIT_ACTIONS = Object.freeze([
+  'user_created',
+  'user_updated',
+  'user_role_changed',
+  'user_activated',
+  'user_deactivated',
+  'password_changed',
+  'company_settings_updated',
+  'login_success',
+  'login_failed',
+  'logout',
+]);

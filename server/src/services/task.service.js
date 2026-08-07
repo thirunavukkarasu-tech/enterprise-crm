@@ -4,6 +4,7 @@ import { Task } from '../models/Task.js';
 import { Activity } from '../models/Activity.js';
 import { ApiError } from '../utils/ApiError.js';
 import { ROLES } from '../utils/roles.js';
+import { notifyUser } from './notification.service.js';
 
 const escapeRegex = (str) => str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
@@ -97,6 +98,14 @@ export const createTask = async (user, payload) => {
 
   const task = await Task.create({ ...payload, assignedTo });
 
+  if (assignedTo.toString() !== user._id.toString()) {
+    await notifyUser(assignedTo, {
+      type: 'task',
+      title: 'New task assigned to you',
+      message: `${user.name} assigned you "${task.title}"`,
+    });
+  }
+
   await logActivity('task_created', `${user.name} created task "${task.title}"`, user, task._id);
 
   return task;
@@ -137,6 +146,13 @@ export const updateTask = async (user, id, payload) => {
     );
   } else if (payload.assignedTo && payload.assignedTo !== previousAssignee) {
     await logActivity('task_assigned', `${user.name} reassigned "${task.title}"`, user, task._id);
+    if (payload.assignedTo !== user._id.toString()) {
+      await notifyUser(payload.assignedTo, {
+        type: 'task',
+        title: 'Task assigned to you',
+        message: `${user.name} assigned you "${task.title}"`,
+      });
+    }
   } else {
     await logActivity('task_updated', `${user.name} updated "${task.title}"`, user, task._id);
   }

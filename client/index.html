@@ -11,6 +11,17 @@
       href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap"
       rel="stylesheet"
     />
+    <script>
+      // Runs before React mounts so there's no flash of the wrong theme on
+      // load — ThemeContext (src/context/ThemeContext.jsx) takes over from
+      // here and keeps this in sync going forward.
+      (function () {
+        var saved = localStorage.getItem('crm_theme') || 'system';
+        var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        var isDark = saved === 'dark' || (saved === 'system' && prefersDark);
+        document.documentElement.classList.toggle('dark', isDark);
+      })();
+    </script>
   </head>
   <body class="font-body bg-surface text-ink-800">
     <div id="root"></div>

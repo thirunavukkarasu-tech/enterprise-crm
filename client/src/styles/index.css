@@ -2,6 +2,36 @@
 @tailwind components;
 @tailwind utilities;
 
+/**
+ * Theme tokens for the `ink` (text) and `surface` (background) color
+ * families. Dark mode deliberately reuses the *same* hex values that
+ * already exist in the light palette — e.g. dark mode's surface-100 (card
+ * background) is exactly light mode's ink-800 — so the two themes read as
+ * one consistent "Ink & Signal" identity rather than two unrelated
+ * palettes. See tailwind.config.js and docs/ARCHITECTURE.md §12.
+ */
+:root {
+  --color-surface: 245 246 250; /* #F5F6FA */
+  --color-surface-100: 255 255 255; /* #FFFFFF */
+  --color-surface-200: 238 240 246; /* #EEF0F6 */
+  --color-surface-300: 227 230 239; /* #E3E6EF */
+  --color-ink: 18 20 28; /* #12141C */
+  --color-ink-800: 27 30 42; /* #1B1E2A */
+  --color-ink-700: 36 40 56; /* #242838 */
+  --color-ink-600: 46 51 70; /* #2E3346 */
+}
+
+.dark {
+  --color-surface: 15 17 23; /* #0F1117 — slightly deeper than card bg, for contrast */
+  --color-surface-100: 27 30 42; /* #1B1E2A — same hex as light mode's ink-800 */
+  --color-surface-200: 36 40 56; /* #242838 — same hex as light mode's ink-700 */
+  --color-surface-300: 46 51 70; /* #2E3346 — same hex as light mode's ink-600 */
+  --color-ink: 245 246 250; /* #F5F6FA */
+  --color-ink-800: 227 230 239; /* #E3E6EF */
+  --color-ink-700: 199 203 217; /* #C7CBD9 */
+  --color-ink-600: 148 160 184; /* #94A0B8 */
+}
+
 @layer base {
   * {
     @apply border-surface-300;

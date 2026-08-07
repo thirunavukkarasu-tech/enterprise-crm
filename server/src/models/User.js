@@ -37,8 +37,34 @@ const userSchema = new mongoose.Schema(
       type: Boolean,
       default: true,
     },
+    avatarUrl: {
+      type: String,
+      trim: true,
+    },
+    phone: {
+      type: String,
+      trim: true,
+      maxlength: 30,
+    },
+    jobTitle: {
+      type: String,
+      trim: true,
+      maxlength: 100,
+    },
+    preferences: {
+      theme: { type: String, enum: ['light', 'dark', 'system'], default: 'system' },
+      emailNotifications: {
+        taskReminders: { type: Boolean, default: true },
+        leadUpdates: { type: Boolean, default: true },
+        weeklyDigest: { type: Boolean, default: true },
+      },
+    },
     lastLoginAt: {
       type: Date,
+    },
+    lastLoginIp: {
+      type: String,
+      select: false,
     },
     passwordChangedAt: {
       type: Date,

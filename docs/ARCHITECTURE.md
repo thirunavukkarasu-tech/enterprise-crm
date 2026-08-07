@@ -326,10 +326,80 @@ this design leaves room to introduce TanStack Query without a rewrite.
   regression risk than the duplication costs. Noted in the component's
   own docstring as a known follow-up, not silently left unexplained.
 
-## 12. Why This Scales to the Full Module List
+## 12. Notifications, Settings & Administration Architecture (Phase 8 additions)
 
-Every remaining module (Settings)
-plugs into the same skeleton: a Mongoose model, a validator, a service, a
-controller, a router mounted in `app.js`, and a `pages/<module>` folder on the
-frontend with its own service file. Phase 1 exists so that from Phase 2 onward,
-we are only ever adding a module, never restructuring the foundation.
+- **Real-time notifications, with REST as the source of truth, not the
+  socket.** Every notification is created through one function,
+  `notifyUser()` (`server/src/services/notification.service.js`), which
+  persists to MongoDB *and* emits over Socket.IO in the same call. A
+  disconnected socket never loses a notification — it's simply picked up
+  on the next `GET /notifications` — because the DB write doesn't depend
+  on anyone being connected to receive the emit. This is the same
+  "one write path, multiple consumers" discipline established for the
+  `Activity` log in §7–9, applied to a live-updating feed instead of a
+  polled one.
+- **One `AuditLog` collection, two Administration views.** Audit Logs and
+  Login History are the same collection, same service function
+  (`listAuditLogs`), with Login History simply pre-filtering to
+  authentication actions. Building a separate `LoginHistory` collection
+  would mean two write paths that could drift; a decision documented
+  explicitly in `docs/API_ADMIN.md` because it's the same architectural
+  choice made three times now (Activity, Notification categories, Audit
+  Log) and is worth naming as a repeated pattern, not a coincidence.
+- **Audit writes never throw.** `logAudit()` swallows its own errors and
+  logs them server-side instead of propagating — recording that a login
+  happened must never be able to block the login itself. The same
+  "observability must not gate the primary action" principle already
+  applied to the Phase 6 reminder sweep.
+- **CSS-variable-driven theming, not a `dark:` variant on every
+  component.** Adding dark mode to an app with seven phases of already-
+  shipped UI had exactly two options: retrofit `dark:` Tailwind variants
+  onto every existing component, or make the existing color tokens
+  (`ink`, `surface`) resolve through CSS custom properties that a single
+  class on `<html>` swaps. The second approach was chosen specifically
+  *because* it required touching zero already-shipped page components —
+  only `tailwind.config.js` and `src/styles/index.css` changed, plus the
+  one place (`Sidebar`) that needed to opt *out* of theming (the sidebar
+  is deliberately always-dark, so it was given its own fixed `sidebar`
+  token family instead of the theme-aware `ink` tokens). The trade-off:
+  any *new* component still needs to use the semantic `ink`/`surface`
+  tokens rather than a literal hex value to stay theme-safe — an easy
+  rule to follow, and one violation of it (a modal backdrop using `ink`
+  where a fixed-dark color was needed) was caught in review for this
+  phase.
+- **Self-service (`/users/me/*`) vs. Administration (`/admin/users/*`) are
+  separate route files, not one route with a role branch.** A user's own
+  profile has different validation, different fields (no `role`/`isActive`
+  from self-service), and different audit semantics than an admin
+  managing someone else's account — keeping them as separate routers
+  makes each one's `authorize()` requirement obvious at a glance rather
+  than buried in an if-statement.
+- **Admin self-protection enforced server-side, not just hidden in the
+  UI.** An admin can't demote or deactivate their own account via the API
+  (`server/src/services/user.service.js#updateUser`) — the form also
+  disables those fields when editing yourself, but that's UX courtesy;
+  the actual boundary is the 403 the server returns regardless of what
+  the client sends.
+- **Roles & Permissions is a reference, not an editor.** This app uses
+  four fixed roles checked via `authorize()` on each route, not a
+  granular per-permission system — so `RolesTab.jsx` renders a read-only
+  capability matrix sourced from what's actually enforced elsewhere in
+  the codebase, rather than a settings screen that implies permissions
+  are dynamically configurable when they aren't. Documented as a known
+  extension point (a real permission-matrix editor is a different
+  authorization model, not an incremental change) rather than a
+  half-built toggle UI that doesn't actually do anything.
+
+## 13. Why This Scales to the Full Module List
+
+Every module in the original roadmap — Authentication, Dashboard,
+Customers, Leads, Tasks & Follow-ups, Reports, and Notifications/Settings/
+Administration — plugged into the same skeleton established in Phase 1: a
+Mongoose model, a validator, a service, a controller, a router mounted in
+`app.js`, and a `pages/<module>` folder on the frontend with its own
+service file. From Phase 2 onward, every phase was purely additive — no
+phase required restructuring a previous one's foundation, which was the
+entire point of investing in that foundation first. The same skeleton is
+still the extension point for whatever comes next (Product Catalog,
+Billing, Integrations, ...): add a model, a service, a router, mount it,
+add a `pages/<module>` folder, and register one line in `utils/navigation.js`.

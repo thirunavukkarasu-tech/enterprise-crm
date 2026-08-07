@@ -1,4 +1,4 @@
-import { Bell, BellOff, Target, Briefcase, ListTodo, Info } from 'lucide-react';
+import { Bell, BellOff, Target, Briefcase, ListTodo, Info, ShieldAlert, Settings } from 'lucide-react';
 import clsx from 'clsx';
 import { useApiQuery } from '../../../hooks/useApiQuery.js';
 import { dashboardService } from '../../../services/dashboardService.js';
@@ -8,8 +8,11 @@ import { formatRelativeTime } from '../../../utils/formatters.js';
 
 const TYPE_ICONS = {
   lead: Target,
+  followup: Target,
   opportunity: Briefcase,
   task: ListTodo,
+  security: ShieldAlert,
+  admin: Settings,
   system: Info,
 };
 

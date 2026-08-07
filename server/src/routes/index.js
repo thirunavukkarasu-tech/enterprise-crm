@@ -8,6 +8,9 @@ import taskRoutes from './task.routes.js';
 import followUpRoutes from './followup.routes.js';
 import userRoutes from './user.routes.js';
 import reportRoutes from './report.routes.js';
+import notificationRoutes from './notification.routes.js';
+import adminRoutes from './admin.routes.js';
+import settingsRoutes from './settings.routes.js';
 
 const router = Router();
 
@@ -20,8 +23,8 @@ router.use('/tasks', taskRoutes);
 router.use('/followups', followUpRoutes);
 router.use('/users', userRoutes);
 router.use('/reports', reportRoutes);
-
-// Phase 8+: mounted here as each module ships
-// router.use('/settings', settingsRoutes);
+router.use('/notifications', notificationRoutes);
+router.use('/admin', adminRoutes);
+router.use('/settings', settingsRoutes);
 
 export default router;

@@ -13,6 +13,11 @@ import { errorHandler, notFoundHandler } from './middleware/errorHandler.js';
 
 const app = express();
 
+// Trust the first hop (reverse proxy / PaaS load balancer) so req.ip is the
+// real client address rather than the proxy's — audit logs and login
+// history (Phase 8) depend on this being accurate.
+app.set('trust proxy', 1);
+
 // --- Security & parsing middleware ---------------------------------------
 app.use(helmet());
 app.use(

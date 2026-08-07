@@ -16,3 +16,5 @@ export const ROLE_LABELS = {
   [ROLES.MANAGER]: 'Manager',
   [ROLES.EMPLOYEE]: 'Employee',
 };
+
+export const ALL_ROLES = Object.values(ROLES);
